@@ -65,7 +65,7 @@
           <i data-lucide="shopping-bag"></i> 跨領域智慧商品關聯推薦系統
         </h1>
         <p class="text-indigo-200 mt-1 text-sm">
-          應用離散數學：$100 \times 1000$ 矩陣 + **Hash Map ($O(1)$)** + **Debounce** + **Virtual Windowing**
+          應用離散數學：$100 \times 800$ 矩陣集合 + **唯一名稱與金額不重複演算法**
         </p>
       </div>
       <!-- 右上角購物車圖案與品項按鈕 -->
@@ -106,21 +106,20 @@
       <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
         <label class="flex items-center justify-between cursor-pointer">
           <span class="text-sm font-semibold text-slate-700 flex items-center gap-1">
-            <i data-lucide="eye" class="w-4 h-4 text-indigo-600"></i> 顯示所有配件 (共 1000 款)
+            <i data-lucide="eye" class="w-4 h-4 text-indigo-600"></i> 顯示所有配件 (共 800 款)
           </span>
           <input type="checkbox" id="showAllToggle" onchange="calculateRecommendations()" class="w-4 h-4 accent-indigo-600 rounded">
         </label>
-        <p class="text-xs text-slate-400 mt-1">勾選後將載入全部 1,000 款多元配件</p>
+        <p class="text-xs text-slate-400 mt-1">勾選後將載入全部 800 款獨立不重複配件</p>
       </div>
 
       <!-- 離散數學理論說明小卡 -->
       <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100 text-xs text-indigo-900 space-y-2">
         <div class="font-bold text-sm text-indigo-700 border-b border-indigo-200 pb-1 flex items-center gap-1">
-          <i data-lucide="brain-circuit" class="w-4 h-4"></i> 三大效能優化架構
+          <i data-lucide="brain-circuit" class="w-4 h-4"></i> 唯一性集合生成 (Unique Set)
         </div>
-        <p><strong>1. Hash Map ($O(1)$):</strong> 預建快取矩陣，免除重複迴圈搜尋。</p>
-        <p><strong>2. Debounce:</strong> 滑桿防抖控制，過濾高頻計算事件。</p>
-        <p><strong>3. Virtual Windowing:</strong> 滾動視窗動態載入，維持極致 60 FPS。</p>
+        <p><strong>• 唯一名稱矩陣:</strong> 運用笛卡兒積概念組合 10 大領域，確保 800 款商品名稱 100% 互異。</p>
+        <p><strong>• 唯一金額映射:</strong> 透過質數擾動與不重複雜湊對應，確保每項商品價格獨立無重複。</p>
       </div>
 
     </section>
@@ -205,8 +204,7 @@
 
   <script>
     // -------------------------------------------------------------
-    // 1. 多維度三階矩陣詞庫 (品牌系列 × 規格屬性 × 核心品項)
-    // 確保 1,000 款配件名稱 100% 獨一無二且真實
+    // 1. 產生 100 款主商品與 800 款「名稱與金額絕對不重複」的配件
     // -------------------------------------------------------------
     const categoryData = [
       {
@@ -273,6 +271,8 @@
 
     const mainProducts = [];
     const accessories = [];
+    const usedNames = new Set();
+    const usedPrices = new Set();
 
     // 生成 100 款主商品
     for (let i = 1; i <= 100; i++) {
@@ -286,18 +286,37 @@
       });
     }
 
-    // 生成 1,000 款配件 (利用三維矩陣交叉索引，確保 1,000 個名稱絕對不重複)
-    for (let j = 1; j <= 1000; j++) {
+    // 生成 800 款配件（確保名稱與價格絕對唯一）
+    for (let j = 1; j <= 800; j++) {
       const cat = categoryData[(j - 1) % categoryData.length];
       
-      const brand = cat.brands[(j * 7) % cat.brands.length];
-      const spec = cat.specs[(j * 13) % cat.specs.length];
-      const core = cat.cores[(j * 19) % cat.cores.length];
+      // 確保名稱絕對不重複的組合迴圈
+      let brand = cat.brands[(j * 7) % cat.brands.length];
+      let spec = cat.specs[(j * 13) % cat.specs.length];
+      let core = cat.cores[(j * 19) % cat.cores.length];
+      let candidateName = `${brand}｜${spec} ${core}`;
+
+      let collisionCount = 1;
+      while (usedNames.has(candidateName)) {
+        brand = cat.brands[(j * 7 + collisionCount) % cat.brands.length];
+        spec = cat.specs[(j * 13 + collisionCount) % cat.specs.length];
+        core = cat.cores[(j * 19 + collisionCount) % cat.cores.length];
+        candidateName = `${brand}｜${spec} ${core} (系列 ${collisionCount})`;
+        collisionCount++;
+      }
+      usedNames.add(candidateName);
+
+      // 確保金額絕對不重複的質數擾動演算法
+      let candidatePrice = 300 + (j * 43) + ((j * 97) % 28500);
+      while (usedPrices.has(candidatePrice)) {
+        candidatePrice += 11; // 加上質數直到金額唯一
+      }
+      usedPrices.add(candidatePrice);
 
       accessories.push({
         id: `A${String(j).padStart(4, '0')}`,
-        name: `${brand}｜${spec} ${core}`,
-        price: 300 + ((j * 37) % 29500),
+        name: candidateName,
+        price: candidatePrice,
         catId: (j - 1) % categoryData.length,
         img: cat.img
       });
