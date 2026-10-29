@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>智慧商品關聯推薦系統 (Discrete Math Recommendation System)</title>
+  <!-- Tailwind CSS CDN (介面美化) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-indigo-600 text-white py-6 shadow-md">
+    <div class="max-w-6xl mx-auto px-4">
+      <h1 class="text-3xl font-bold flex items-center gap-2">
+        <i data-lucide="shopping-bag"></i> 智慧商品關聯推薦系統
+      </h1>
+      <p class="text-indigo-200 mt-1 text-sm">
+        應用離散數學：集合 (Sets)、二元關係矩陣 (Relation Matrix) 與加權圖論 (Weighted Graph)
+      </p>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <!-- 左側：設定與控制區 -->
+    <section class="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-6">
+      
+      <!-- 步驟 1: 選擇主要商品 -->
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
+          <i data-lucide="package" class="w-4 h-4 text-indigo-600"></i> 1. 選擇主商品 $x \in S$
+        </label>
+        <select id="primaryProductSelect" onchange="calculateRecommendations()" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          <!-- JS 動態生成 -->
+        </select>
+      </div>
+
+      <!-- 步驟 2: 設定預算限制 -->
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
+          <i data-lucide="dollar-sign" class="w-4 h-4 text-indigo-600"></i> 2. 設定配件預算限制
+        </label>
+        <div class="flex items-center gap-3">
+          <input type="range" id="budgetRange" min="500" max="20000" step="500" value="8000" oninput="updateBudgetDisplay(); calculateRecommendations();" class="w-full accent-indigo-600">
+          <span id="budgetValue" class="font-bold text-indigo-600 min-w-[80px] text-right">NT$ 8,000</span>
+        </div>
+      </div>
+
+      <!-- 離散數學理論說明小卡 -->
+      <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100 text-xs text-indigo-900 space-y-2">
+        <div class="font-bold text-sm text-indigo-700 border-b border-indigo-200 pb-1 flex items-center gap-1">
+          <i data-lucide="brain-circuit" class="w-4 h-4"></i> 離散數學核心原理
+        </div>
+        <p><strong>• 集合 (Set $S$):</strong> 所有商品的集合。</p>
+        <p><strong>• 關係加權 (Weighted Relation $R$):</strong> $R(x, y) = w$ 表示商品 $x$ 與 $y$ 之關聯分數 (1~10 分)。</p>
+        <p><strong>• 推薦子集 ($R_{rec}$):</strong> 篩選滿滿足預算且關聯分數大於臨界值之商品集合：<br>
+          <code class="bg-white px-1 py-0.5 rounded border border-indigo-200 text-indigo-800">R_rec = { y ∈ S | (x, y) ∈ R ∧ price(y) ≤ Budget }</code>
+        </p>
+      </div>
+
+    </section>
+
+    <!-- 右側：結果展示區 -->
+    <section class="lg:col-span-2 space-y-6">
+      
+      <!-- 主商品資訊卡 -->
+      <div id="mainProductCard" class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
+        <!-- JS 動態渲染 -->
+      </div>
+
+      <!-- 推薦配件清單 -->
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <i data-lucide="sparkles" class="text-amber-500"></i> 智慧推薦配件 (按關聯度排序)
+        </h2>
+        <div id="recommendationList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- JS 動態渲染 -->
+        </div>
+      </div>
+
+      <!-- 關聯矩陣視覺化 (離散數學成果展示) -->
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <h2 class="text-md font-bold text-slate-800 mb-3 flex items-center gap-2">
+          <i data-lucide="grid" class="text-indigo-600"></i> 當前商品的關聯權重矩陣列 (Relation Vector)
+        </h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-600">
+                <th class="p-2 border">目標配件 $y$</th>
+                <th class="p-2 border">配件價格</th>
+                <th class="p-2 border">關聯分數 $W(x,y)$</th>
+                <th class="p-2 border">預算符合</th>
+                <th class="p-2 border">推薦狀態</th>
+              </tr>
+            </thead>
+            <tbody id="matrixTableBody">
+              <!-- JS 動態渲染 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    // -------------------------------------------------------------
+    // 1. 資料定義：商品集合 Set S 與 關係矩陣 Relation Matrix R
+    // -------------------------------------------------------------
+    const products = [
+      { id: "P01", name: "電競主機", price: 35000, category: "Main", img: "🖥️" },
+      { id: "P02", name: "輕薄筆記型電腦", price: 28000, category: "Main", img: "💻" },
+      { id: "P03", name: "平板電腦", price: 15000, category: "Main", img: "📱" },
+      { id: "A01", name: "27吋 4K 螢幕", price: 8500, category: "Accessory", img: "🖥️" },
+      { id: "A02", name: "機械式鍵盤", price: 2500, category: "Accessory", img: "⌨️" },
+      { id: "A03", name: "無線電競滑鼠", price: 1800, category: "Accessory", img: "🖱️" },
+      { id: "A04", name: "降噪耳罩式耳機", price: 3200, category: "Accessory", img: "🎧" },
+      { id: "A05", name: "USB-C 多功能集線器", price: 1200, category: "Accessory", img: "🔌" },
+      { id: "A06", name: "觸控筆", price: 2800, category: "Accessory", img: "✏️" },
+      { id: "A07", name: "筆電散熱支架", price: 800, category: "Accessory", img: "📐" }
+    ];
+
+    // 關聯權重矩陣：Relation Matrix W[main_id][accessory_id] (分數 1~10)
+    const relationWeights = {
+      "P01": { "A01": 9, "A02": 10, "A03": 10, "A04": 8, "A05": 3, "A06": 1, "A07": 2 }, // 電競主機
+      "P02": { "A01": 6, "A02": 5, "A03": 7, "A04": 6, "A05": 10, "A06": 4, "A07": 9 }, // 筆電
+      "P03": { "A01": 2, "A02": 4, "A03": 3, "A04": 7, "A05": 6, "A06": 10, "A07": 5 }  // 平板
+    };
+
+    // -------------------------------------------------------------
+    // 2. 界面初始化與控制邏輯
+    // -------------------------------------------------------------
+    window.onload = function() {
+      const select = document.getElementById("primaryProductSelect");
+      products.filter(p => p.category === "Main").forEach(p => {
+        const option = document.createElement("option");
+        option.value = p.id;
+        option.innerText = `${p.img} ${p.name} (NT$ ${p.price.toLocaleString()})`;
+        select.appendChild(option);
+      });
+
+      lucide.createIcons();
+      calculateRecommendations();
+    };
+
+    function updateBudgetDisplay() {
+      const budget = document.getElementById("budgetRange").value;
+      document.getElementById("budgetValue").innerText = `NT$ ${parseInt(budget).toLocaleString()}`;
+    }
+
+    // -------------------------------------------------------------
+    // 3. 離散數學推薦演算法 (Core Logic)
+    // -------------------------------------------------------------
+    function calculateRecommendations() {
+      const selectedMainId = document.getElementById("primaryProductSelect").value;
+      const budget = parseInt(document.getElementById("budgetRange").value);
+      
+      const mainProduct = products.find(p => p.id === selectedMainId);
+      const weights = relationWeights[selectedMainId];
+
+      // 渲染主商品卡片
+      document.getElementById("mainProductCard").innerHTML = `
+        <div class="text-4xl bg-slate-100 p-3 rounded-lg">${mainProduct.img}</div>
+        <div>
+          <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">已選擇主商品</span>
+          <h3 class="text-xl font-bold text-slate-800">${mainProduct.name}</h3>
+          <p class="text-slate-500 font-semibold">NT$ ${mainProduct.price.toLocaleString()}</p>
+        </div>
+      `;
+
+      // 取得配件清單並運算
+      const accessories = products.filter(p => p.category === "Accessory");
+      
+      const processedList = accessories.map(acc => {
+        const weight = weights[acc.id] || 0;
+        const fitsBudget = acc.price <= budget;
+        const isRecommended = fitsBudget && weight >= 5; // 門檻設定：關聯分 >= 5 且未超預算
+        
+        return { ...acc, weight, fitsBudget, isRecommended };
+      });
+
+      // 排序：推薦的優先，再按關聯分數高到低排序
+      processedList.sort((a, b) => b.weight - a.weight);
+
+      // 渲染推薦清單 (過濾出符合推薦的)
+      const recContainer = document.getElementById("recommendationList");
+      recContainer.innerHTML = "";
+      
+      const recommendedItems = processedList.filter(item => item.isRecommended);
+
+      if (recommendedItems.length === 0) {
+        recContainer.innerHTML = `
+          <div class="col-span-2 text-center py-8 text-slate-400">
+            <p>在預算 NT$ ${budget.toLocaleString()} 內，沒有找到推薦的關聯配件。</p>
+            <p class="text-xs mt-1">請嘗試提高預算上限！</p>
+          </div>`;
+      } else {
+        recommendedItems.forEach(item => {
+          recContainer.innerHTML += `
+            <div class="border border-slate-200 rounded-lg p-4 bg-white hover:border-indigo-300 transition shadow-sm flex flex-col justify-between">
+              <div class="flex items-start justify-between">
+                <div class="flex items-center gap-3">
+                  <span class="text-3xl">${item.img}</span>
+                  <div>
+                    <h4 class="font-bold text-slate-800">${item.name}</h4>
+                    <p class="text-indigo-600 font-bold text-sm">NT$ ${item.price.toLocaleString()}</p>
+                  </div>
+                </div>
+                <span class="text-xs px-2 py-1 bg-amber-100 text-amber-800 font-bold rounded-full">
+                  關聯度: ${item.weight}/10
+                </span>
+              </div>
+            </div>
+          `;
+        });
+      }
+
+      // 渲染離散數學矩陣表
+      const tableBody = document.getElementById("matrixTableBody");
+      tableBody.innerHTML = "";
+
+      processedList.forEach(item => {
+        const budgetStatus = item.fitsBudget 
+          ? `<span class="text-emerald-600 font-semibold">✓ 符合</span>` 
+          : `<span class="text-rose-500 font-semibold">✕ 超過</span>`;
+
+        const recStatus = item.isRecommended 
+          ? `<span class="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded text-xs font-bold">推薦 (Rec)</span>` 
+          : `<span class="text-slate-400 text-xs">不推薦</span>`;
+
+        tableBody.innerHTML += `
+          <tr class="border-b hover:bg-slate-50">
+            <td class="p-2 flex items-center gap-1">${item.img} ${item.name}</td>
+            <td class="p-2">NT$ ${item.price.toLocaleString()}</td>
+            <td class="p-2 font-bold text-indigo-600">${item.weight}</td>
+            <td class="p-2">${budgetStatus}</td>
+            <td class="p-2">${recStatus}</td>
+          </tr>
+        `;
+      });
+
+      lucide.createIcons();
+    }
+  </script>
+</body>
+</html>
