@@ -13,13 +13,13 @@
 
   <!-- Header -->
   <header class="bg-indigo-600 text-white py-6 shadow-md">
-    <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
+    <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
       <div>
         <h1 class="text-3xl font-bold flex items-center gap-2">
-          <i data-lucide="shopping-bag"></i> 智慧商品關聯推薦系統
+          <i data-lucide="shopping-bag"></i> 智慧商品關聯推薦系統 (大型資料集)
         </h1>
         <p class="text-indigo-200 mt-1 text-sm">
-          應用離散數學：多重集合、大型關係矩陣與總金額動態加總運算
+          應用離散數學：大型有限集合 $S$、關聯權重矩陣 $W$ 與動態子集總金額加總
         </p>
       </div>
       <!-- 購物車按鈕指示 -->
@@ -30,7 +30,7 @@
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+  <main class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
     
     <!-- 左側：設定與控制區 -->
     <section class="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-6">
@@ -38,7 +38,7 @@
       <!-- 步驟 1: 選擇主要商品 -->
       <div>
         <label class="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
-          <i data-lucide="package" class="w-4 h-4 text-indigo-600"></i> 1. 選擇主商品 $x \in S$
+          <i data-lucide="package" class="w-4 h-4 text-indigo-600"></i> 1. 選擇主商品 $x \in S$ (共 20 款)
         </label>
         <select id="primaryProductSelect" onchange="onMainProductChange()" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
           <!-- JS 動態生成 -->
@@ -48,11 +48,11 @@
       <!-- 步驟 2: 設定預算限制 -->
       <div>
         <label class="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
-          <i data-lucide="dollar-sign" class="w-4 h-4 text-indigo-600"></i> 2. 設定配件預算限制
+          <i data-lucide="dollar-sign" class="w-4 h-4 text-indigo-600"></i> 2. 設定配件預算上限
         </label>
         <div class="flex items-center gap-3">
-          <input type="range" id="budgetRange" min="500" max="15000" step="500" value="6000" oninput="updateBudgetDisplay(); calculateRecommendations();" class="w-full accent-indigo-600">
-          <span id="budgetValue" class="font-bold text-indigo-600 min-w-[80px] text-right">NT$ 6,000</span>
+          <input type="range" id="budgetRange" min="500" max="25000" step="500" value="8000" oninput="updateBudgetDisplay(); calculateRecommendations();" class="w-full accent-indigo-600">
+          <span id="budgetValue" class="font-bold text-indigo-600 min-w-[80px] text-right">NT$ 8,000</span>
         </div>
       </div>
 
@@ -61,8 +61,8 @@
         <div class="font-bold text-sm text-indigo-700 border-b border-indigo-200 pb-1 flex items-center gap-1">
           <i data-lucide="brain-circuit" class="w-4 h-4"></i> 離散數學核心原理
         </div>
-        <p><strong>• 集合 ($S$):</strong> 包含多樣化主商品與豐富配件的完整商品集合。</p>
-        <p><strong>• 關聯矩陣 ($W$):</strong> 定義多對多帶權重的二元關係分數 (1~10分)。</p>
+        <p><strong>• 集合 ($S$):</strong> 涵蓋 20 款主商品與 50 款豐富配件的大型有限集合。</p>
+        <p><strong>• 關聯矩陣 ($W$):</strong> $20 \times 50$ 雙向權重關係矩陣，對應各類別產品相容性。</p>
         <p><strong>• 購物車總額 ($C$):</strong> 計算選購子集的價格總和：<br>
           <code class="bg-white px-1 py-0.5 rounded border border-indigo-200 text-indigo-800">Total = Σ price(c) for c ∈ C</code>
         </p>
@@ -83,7 +83,7 @@
         <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
           <i data-lucide="sparkles" class="text-amber-500"></i> 智慧推薦配件 (可直接加入購物車)
         </h2>
-        <div id="recommendationList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div id="recommendationList" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[500px] overflow-y-auto pr-2">
           <!-- JS 動態渲染 -->
         </div>
       </div>
@@ -107,12 +107,12 @@
       <!-- 關聯矩陣視覺化 -->
       <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
         <h2 class="text-md font-bold text-slate-800 mb-3 flex items-center gap-2">
-          <i data-lucide="grid" class="text-indigo-600"></i> 當前商品的完整關聯權重矩陣列 (Relation Vector)
+          <i data-lucide="grid" class="text-indigo-600"></i> 當前商品的完整關聯權重矩陣列 (共 50 筆配件關聯)
         </h2>
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto max-h-96">
           <table class="w-full text-sm text-left border-collapse">
-            <thead>
-              <tr class="bg-slate-100 text-slate-600">
+            <thead class="sticky top-0 bg-slate-100">
+              <tr class="text-slate-600">
                 <th class="p-2 border">目標配件 $y$</th>
                 <th class="p-2 border">配件價格</th>
                 <th class="p-2 border">關聯分數 $W(x,y)$</th>
@@ -133,51 +133,111 @@
 
   <script>
     // -------------------------------------------------------------
-    // 1. 擴充後的商品資料庫 (Set S)
+    // 1. 20 款主商品與 50 款配件的大型資料集 (Set S)
     // -------------------------------------------------------------
-    const products = [
-      // 主商品群組 (Main Products)
-      { id: "P01", name: "電競主機", price: 35000, category: "Main", img: "🖥️" },
-      { id: "P02", name: "輕薄筆記型電腦", price: 28000, category: "Main", img: "💻" },
-      { id: "P03", name: "平板電腦", price: 15000, category: "Main", img: "📱" },
-      { id: "P04", name: "旗艦智慧型手機", price: 26000, category: "Main", img: "📲" },
-      { id: "P05", name: "專業數位相機", price: 42000, category: "Main", img: "📷" },
-      { id: "P06", name: "家用遊戲主機", price: 16000, category: "Main", img: "🎮" },
-
-      // 配件群組 (Accessories)
-      { id: "A01", name: "27吋 4K 電腦螢幕", price: 8500, category: "Accessory", img: "🖥️" },
-      { id: "A02", name: "RGB 機械式鍵盤", price: 2500, category: "Accessory", img: "⌨️" },
-      { id: "A03", name: "無線電競滑鼠", price: 1800, category: "Accessory", img: "🖱️" },
-      { id: "A04", name: "主動降噪藍牙耳機", price: 3200, category: "Accessory", img: "🎧" },
-      { id: "A05", name: "USB-C 多功能集線器", price: 1200, category: "Accessory", img: "🔌" },
-      { id: "A06", name: "高精度繪圖觸控筆", price: 2800, category: "Accessory", img: "✏️" },
-      { id: "A07", name: "鋁合金筆電散熱支架", price: 800, category: "Accessory", img: "📐" },
-      { id: "A08", name: "20000mAh 高速行動電源", price: 1500, category: "Accessory", img: "🔋" },
-      { id: "A09", name: "RGB 桌面重低音喇叭", price: 2200, category: "Accessory", img: "🔊" },
-      { id: "A10", name: "護眼智慧螢幕掛燈", price: 1300, category: "Accessory", img: "💡" },
-      { id: "A11", name: "1TB 高速外接行動硬碟", price: 2600, category: "Accessory", img: "💾" },
-      { id: "A12", name: "藍牙無線遊戲手把", price: 1600, category: "Accessory", img: "🕹️" },
-      { id: "A13", name: "相機碳纖維三腳架", price: 1900, category: "Accessory", img: "📷" }
+    const mainProducts = [
+      { id: "P01", name: "頂級電競桌機", price: 45000, img: "🖥️" },
+      { id: "P02", name: "商務輕薄筆電", price: 32000, img: "💻" },
+      { id: "P03", name: "旗艦繪圖平板", price: 24000, img: "📱" },
+      { id: "P04", name: "高階智慧型手機", price: 29000, img: "📲" },
+      { id: "P05", name: "全片幅微單眼相機", price: 52000, img: "📷" },
+      { id: "P06", name: "次世代家用遊戲機", price: 16000, img: "🎮" },
+      { id: "P07", name: "可攜式行動工作站", price: 41000, img: "💻" },
+      { id: "P08", name: "AI 智慧音箱中樞", price: 4500, img: "🔊" },
+      { id: "P09", name: "專業音樂製作工作站", price: 38000, img: "🎹" },
+      { id: "P10", name: "運動穿戴智慧手錶", price: 9500, img: "⌚" },
+      { id: "P11", name: "4K 投影家庭劇院", price: 28000, img: "📽️" },
+      { id: "P12", name: "VR 虛擬實境頭戴裝置", price: 19000, img: "🥽" },
+      { id: "P13", name: "無人空拍機", price: 23000, img: "🛸" },
+      { id: "P14", name: "電子紙閱讀器", price: 7800, img: "📖" },
+      { id: "P15", name: "專業級錄音室麥克風", price: 6500, img: "🎤" },
+      { id: "P16", name: "串流直播主導播機", price: 15000, img: "🎛️" },
+      { id: "P17", name: "智慧聯網電視", price: 31000, img: "📺" },
+      { id: "P18", name: "高階雙輪電動滑板車", price: 22000, img: "🛴" },
+      { id: "P19", name: "智慧自動感應咖啡機", price: 18000, img: "☕" },
+      { id: "P20", name: "專業雷射雕刻機", price: 35000, img: "⚙️" }
     ];
 
-    // 擴充後的二元關係權重矩陣 (Relation Matrix W[main_id][accessory_id])
-    const relationWeights = {
-      "P01": { "A01": 9, "A02": 10, "A03": 10, "A04": 8, "A05": 3, "A06": 1, "A07": 2, "A08": 2, "A09": 9, "A10": 8, "A11": 7, "A12": 9, "A13": 1 },
-      "P02": { "A01": 6, "A02": 5, "A03": 7, "A04": 6, "A05": 10, "A06": 4, "A07": 9, "A08": 8, "A09": 4, "A10": 7, "A11": 9, "A12": 3, "A13": 2 },
-      "P03": { "A01": 2, "A02": 4, "A03": 3, "A04": 7, "A05": 6, "A06": 10, "A07": 5, "A08": 9, "A09": 5, "A10": 3, "A11": 4, "A12": 6, "A13": 2 },
-      "P04": { "A01": 1, "A02": 2, "A03": 2, "A04": 9, "A05": 7, "A06": 5, "A07": 3, "A08": 10, "A09": 6, "A10": 2, "A11": 5, "A12": 5, "A13": 3 },
-      "P05": { "A01": 5, "A02": 2, "A03": 3, "A04": 4, "A05": 8, "A06": 2, "A07": 2, "A08": 7, "A09": 3, "A10": 2, "A11": 10, "A12": 1, "A13": 10 },
-      "P06": { "A01": 8, "A02": 3, "A03": 3, "A04": 9, "A05": 4, "A06": 1, "A07": 1, "A08": 4, "A09": 8, "A10": 5, "A11": 6, "A12": 10, "A13": 1 }
-    };
+    const accessories = [
+      { id: "A01", name: "27吋 4K 專業曲面螢幕", price: 10500, img: "🖥️" },
+      { id: "A02", name: "RGB 機械式青軸鍵盤", price: 2800, img: "⌨️" },
+      { id: "A03", name: "三模無線電競滑鼠", price: 1900, img: "🖱️" },
+      { id: "A04", name: "主動降噪藍牙耳罩式耳機", price: 4200, img: "🎧" },
+      { id: "A05", name: "USB-C 10-in-1 多功能集線器", price: 1500, img: "🔌" },
+      { id: "A06", name: "高精度防手震主動觸控筆", price: 3200, img: "✏️" },
+      { id: "A07", name: "鋁合金人體工學筆電散熱支架", price: 990, img: "📐" },
+      { id: "A08", name: "25000mAh 雙向快充行動電源", price: 1680, img: "🔋" },
+      { id: "A09", name: "藍牙 RGB 桌面重低音喇叭", price: 2500, img: "🔊" },
+      { id: "A10", name: "護眼智慧自動調光螢幕掛燈", price: 1480, img: "💡" },
+      { id: "A11", name: "2TB 高速外接固態硬碟 (PSSD)", price: 3600, img: "💾" },
+      { id: "A12", name: "多平台藍牙無線遊戲手把", price: 1790, img: "🕹️" },
+      { id: "A13", name: "專業相機碳纖維輕量三腳架", price: 2200, img: "📷" },
+      { id: "A14", name: "相機防潮乾燥收納箱", price: 1800, img: "📦" },
+      { id: "A15", name: "高速記憶卡 256GB V90", price: 2900, img: "🃏" },
+      { id: "A16", name: "高效能 CPU 一體式水冷散熱器", price: 3800, img: "❄️" },
+      { id: "A17", name: "模組化 850W 金牌電源供應器", price: 3900, img: "⚡" },
+      { id: "A18", name: "DDR5 32GB 雙通道超頻記憶體", price: 3400, img: "🧩" },
+      { id: "A19", name: "透側 RGB 電競大型機殼", price: 2600, img: "🖥️" },
+      { id: "A20", name: "防磁大尺寸超厚電競滑鼠墊", price: 680, img: "🟧" },
+      { id: "A21", name: "筆電專用防震收納內膽包", price: 590, img: "💼" },
+      { id: "A22", name: "磁吸式車用無線充電手機架", price: 890, img: "📱" },
+      { id: "A23", name: "手機專用廣角微距鏡頭組", price: 790, img: "🔍" },
+      { id: "A24", name: "可攜式摺疊藍牙鍵盤", price: 1200, img: "⌨️" },
+      { id: "A25", name: "智慧手錶多色尼龍運動錶帶", price: 390, img: "⌚" },
+      { id: "A26", name: "手錶專用磁吸無線充電座", price: 690, img: "🔋" },
+      { id: "A27", name: "投影機專用 100 吋壁掛布幕", price: 1990, img: "📽️" },
+      { id: "A28", name: "HDMI 2.1 高畫質編織傳輸線", price: 550, img: "🔗" },
+      { id: "A29", name: "VR 舒適頭帶與面罩升級組", price: 1280, img: "🥽" },
+      { id: "A30", name: "空拍機專用 ND 減光鏡片組", price: 1450, img: "📷" },
+      { id: "A31", name: "空拍機備用智慧飛行電池", price: 2800, img: "🔋" },
+      { id: "A32", name: "電子書閱讀器磁吸保護皮套", price: 790, img: "📖" },
+      { id: "A33", name: "錄音室專業防噴罩與支架", price: 650, img: "🎙️" },
+      { id: "A34", name: "直播補光燈與桌面支架組", price: 980, img: "💡" },
+      { id: "A35", name: "智慧電視壁掛金屬支架", price: 1200, img: "📺" },
+      { id: "A36", name: "電動滑板車安全防護頭盔", price: 990, img: "⛑️" },
+      { id: "A37", name: "咖啡機專用食品級除垢清潔劑", price: 450, img: "🧴" },
+      { id: "A38", name: "雷射雕刻專用防護安全眼鏡", price: 590, img: "👓" },
+      { id: "A39", name: "多功能精密螺絲起子工具組", price: 490, img: "🔧" },
+      { id: "A40", name: "桌面整線理線器與集線套", price: 290, img: "🧵" },
+      { id: "A41", name: "主動式抗噪耳機專用耳墊", price: 450, img: "🎧" },
+      { id: "A42", name: "Type-C 高速編織充電線 2m", price: 390, img: "🔌" },
+      { id: "A43", name: "桌面迷你吸塵清潔小幫手", price: 350, img: "🧹" },
+      { id: "A44", name: "螢幕專用清潔組與拭鏡布", price: 250, img: "🧽" },
+      { id: "A45", name: "多功能防潑水大容量後背包", price: 1880, img: "🎒" },
+      { id: "A46", name: "可攜式折疊筆電鋁合金小桌", price: 950, img: "🪵" },
+      { id: "A47", name: "桌面植栽療癒小盆栽裝飾", price: 320, img: "🌱" },
+      { id: "A48", name: "USB 供電迷你靜音桌上扇", price: 420, img: "🌀" },
+      { id: "A49", name: "金屬質感手機桌面支架", price: 350, img: "📱" },
+      { id: "A50", name: "多國旅行萬用轉接充電頭", price: 680, img: "🔌" }
+    ];
+
+    // -------------------------------------------------------------
+    // 2. 智慧關聯演算法自動生成器 (為 20 款主商品自動計算 50 款配件權重)
+    // -------------------------------------------------------------
+    const relationWeights = {};
+    mainProducts.forEach((main, mIdx) => {
+      relationWeights[main.id] = {};
+      accessories.forEach((acc, aIdx) => {
+        // 利用數學雜湊公式自動賦予合理且穩定的 1~10 分關聯權重
+        let score = ((mIdx * 7 + aIdx * 13) % 9) + 2; 
+        
+        // 針對特定相容性進行權重調校
+        if (main.id === "P01" && (acc.id === "A01" || acc.id === "A02" || acc.id === "A03" || acc.id === "A16" || acc.id === "A17" || acc.id === "A18")) score = 10;
+        if (main.id === "P05" && (acc.id === "A13" || acc.id === "A14" || acc.id === "A15")) score = 10;
+        if (main.id === "P03" && (acc.id === "A06" || acc.id === "A24")) score = 10;
+        
+        relationWeights[main.id][acc.id] = score;
+      });
+    });
 
     let cart = [];
 
     // -------------------------------------------------------------
-    // 2. 界面初始化與控制邏輯
+    // 3. 介面初始化與控制邏輯
     // -------------------------------------------------------------
     window.onload = function() {
       const select = document.getElementById("primaryProductSelect");
-      products.filter(p => p.category === "Main").forEach(p => {
+      mainProducts.forEach(p => {
         const option = document.createElement("option");
         option.value = p.id;
         option.innerText = `${p.img} ${p.name} (NT$ ${p.price.toLocaleString()})`;
@@ -194,26 +254,26 @@
 
     function onMainProductChange() {
       const selectedMainId = document.getElementById("primaryProductSelect").value;
-      const mainProduct = products.find(p => p.id === selectedMainId);
+      const mainProduct = mainProducts.find(p => p.id === selectedMainId);
 
       cart = cart.filter(item => item.category !== "Main");
-      cart.unshift({ ...mainProduct });
+      cart.unshift({ ...mainProduct, category: "Main" });
 
       calculateRecommendations();
       updateCartDisplay();
     }
 
     // -------------------------------------------------------------
-    // 3. 購物車操作函數
+    // 4. 購物車操作函數
     // -------------------------------------------------------------
     function toggleCart(productId) {
-      const product = products.find(p => p.id === productId);
+      const product = accessories.find(p => p.id === productId);
       const existingIndex = cart.findIndex(item => item.id === productId);
 
       if (existingIndex > -1) {
         cart.splice(existingIndex, 1);
       } else {
-        cart.push({ ...product });
+        cart.push({ ...product, category: "Accessory" });
       }
 
       calculateRecommendations();
@@ -257,13 +317,13 @@
     }
 
     // -------------------------------------------------------------
-    // 4. 離散數學推薦演算法與渲染
+    // 5. 離散數學推薦演算法與矩陣渲染
     // -------------------------------------------------------------
     function calculateRecommendations() {
       const selectedMainId = document.getElementById("primaryProductSelect").value;
       const budget = parseInt(document.getElementById("budgetRange").value);
       
-      const mainProduct = products.find(p => p.id === selectedMainId);
+      const mainProduct = mainProducts.find(p => p.id === selectedMainId);
       const weights = relationWeights[selectedMainId];
 
       document.getElementById("mainProductCard").innerHTML = `
@@ -280,12 +340,10 @@
         </div>
       `;
 
-      const accessories = products.filter(p => p.category === "Accessory");
-      
       const processedList = accessories.map(acc => {
         const weight = weights[acc.id] || 0;
         const fitsBudget = acc.price <= budget;
-        const isRecommended = fitsBudget && weight >= 6; // 門檻值
+        const isRecommended = fitsBudget && weight >= 7; // 高門檻推薦
         const isInCart = cart.some(item => item.id === acc.id);
         
         return { ...acc, weight, fitsBudget, isRecommended, isInCart };
@@ -293,6 +351,7 @@
 
       processedList.sort((a, b) => b.weight - a.weight);
 
+      // 渲染推薦清單
       const recContainer = document.getElementById("recommendationList");
       recContainer.innerHTML = "";
       
@@ -315,17 +374,17 @@
             <div class="border border-slate-200 rounded-lg p-4 bg-white hover:border-indigo-300 transition shadow-sm flex flex-col justify-between gap-3">
               <div class="flex items-start justify-between">
                 <div class="flex items-center gap-3">
-                  <span class="text-3xl">${item.img}</span>
+                  <span class="text-2xl">${item.img}</span>
                   <div>
-                    <h4 class="font-bold text-slate-800">${item.name}</h4>
-                    <p class="text-indigo-600 font-bold text-sm">NT$ ${item.price.toLocaleString()}</p>
+                    <h4 class="font-bold text-slate-800 text-sm">${item.name}</h4>
+                    <p class="text-indigo-600 font-bold text-xs">NT$ ${item.price.toLocaleString()}</p>
                   </div>
                 </div>
-                <span class="text-xs px-2 py-1 bg-amber-100 text-amber-800 font-bold rounded-full">
-                  關聯度: ${item.weight}/10
+                <span class="text-xs px-2 py-0.5 bg-amber-100 text-amber-800 font-bold rounded-full">
+                  ${item.weight}/10
                 </span>
               </div>
-              <button onclick="toggleCart('${item.id}')" class="w-full py-2 px-3 rounded-lg text-sm font-semibold transition ${btnClass}">
+              <button onclick="toggleCart('${item.id}')" class="w-full py-1.5 px-3 rounded-lg text-xs font-semibold transition ${btnClass}">
                 ${btnText}
               </button>
             </div>
@@ -333,7 +392,7 @@
         });
       }
 
-      // 渲染矩陣表
+      // 渲染 50 筆關聯矩陣表
       const tableBody = document.getElementById("matrixTableBody");
       tableBody.innerHTML = "";
 
