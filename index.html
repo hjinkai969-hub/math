@@ -11,12 +11,19 @@
 </head>
 <body class="bg-slate-50 font-sans text-slate-800 min-h-screen relative">
 
-  <!-- 超預算彈出通知 (Toast Notification) -->
-  <div id="budgetToast" class="fixed top-5 right-5 z-50 bg-rose-600 text-white px-5 py-3 rounded-xl shadow-xl flex items-center gap-3 transition-all duration-300 opacity-0 pointer-events-none transform translate-y-[-10px]">
-    <i data-lucide="alert-triangle" class="w-6 h-6 text-amber-300"></i>
-    <div>
-      <h4 class="font-bold text-sm">預算警告！</h4>
-      <p id="toastMessage" class="text-xs text-rose-100">該商品已超過設定的單品預算上限。</p>
+  <!-- ⚠️ 超預算提示小視窗 (Budget Alert Modal) -->
+  <div id="budgetAlertModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full mx-4 p-6 border border-slate-100 text-center transform scale-95 transition-transform duration-300 id-modal-card">
+      <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-3">
+        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+      </div>
+      <h3 class="text-lg font-bold text-slate-800 mb-1">超過單品預算上限</h3>
+      <p id="alertModalMessage" class="text-xs text-slate-600 mb-5 leading-relaxed">
+        該商品金額已超過設定的預算上限。
+      </p>
+      <button onclick="closeBudgetModal()" class="w-full py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition shadow-md">
+        我知道了
+      </button>
     </div>
   </div>
 
@@ -30,7 +37,7 @@
         <button onclick="closeCheckoutModal()" class="text-indigo-200 hover:text-white text-xl font-bold">✕</button>
       </div>
       
-      <div class="p-6 space-y-4 max-h-[60vh] overflow-y-auto" id="checkoutItemsContainer">
+      <div class="p-6 space-y-3 max-h-[60vh] overflow-y-auto" id="checkoutItemsContainer">
         <!-- JS 動態生成結帳清單 -->
       </div>
 
@@ -61,10 +68,10 @@
           應用離散數學：$100 \times 1000$ 矩陣 + **Hash Map ($O(1)$)** + **Debounce** + **Virtual Windowing**
         </p>
       </div>
-      <!-- 購物車按鈕：點擊可直接觸發結帳 Modal -->
-      <button onclick="openCheckoutModal()" class="bg-indigo-700 hover:bg-indigo-800 px-4 py-2.5 rounded-xl border border-indigo-500 flex items-center gap-2 shadow-sm transition active:scale-95">
-        <i data-lucide="shopping-cart"></i>
-        <span>購物車品項: <strong id="cartCount" class="text-amber-300">0</strong> 項 (點擊結帳)</span>
+      <!-- 右上角購物車圖案與品項按鈕 (點擊跳出結帳畫面) -->
+      <button onclick="openCheckoutModal()" class="bg-indigo-700 hover:bg-indigo-800 px-4 py-2.5 rounded-xl border border-indigo-500 flex items-center gap-2 shadow-sm transition active:scale-95 cursor-pointer">
+        <i data-lucide="shopping-cart" class="w-5 h-5 text-amber-300"></i>
+        <span class="text-sm">購物車品項: <strong id="cartCount" class="text-amber-300 font-bold">0</strong> 項</span>
       </button>
     </div>
   </header>
@@ -126,7 +133,7 @@
         <!-- JS 動態渲染 -->
       </div>
 
-      <!-- 推薦配件清單 (結合虛擬滾動視窗) -->
+      <!-- 推薦配件清單 (虛擬滾動容器) -->
       <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
@@ -137,7 +144,6 @@
           </span>
         </div>
 
-        <!-- 滾動容器：監聽 onscroll -->
         <div id="scrollWindowContainer" onscroll="handleWindowScroll()" class="h-[450px] overflow-y-auto border border-slate-100 rounded-lg p-3 bg-slate-50/50">
           <div id="recommendationList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- JS 動態渲染 -->
@@ -154,7 +160,7 @@
           <h2 class="text-lg font-bold flex items-center gap-2">
             <i data-lucide="shopping-cart"></i> 我的購物車清單與總金額計算
           </h2>
-          <button onclick="openCheckoutModal()" class="px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold rounded-lg text-xs transition flex items-center gap-1 shadow">
+          <button onclick="openCheckoutModal()" class="px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold rounded-lg text-xs transition flex items-center gap-1 shadow cursor-pointer">
             <i data-lucide="arrow-right-circle"></i> 前往結帳
           </button>
         </div>
@@ -239,7 +245,7 @@
       });
     }
 
-    // O(1) 雜湊快取矩陣表初始化 (Hash Map Cache)
+    // O(1) 雜湊快取矩陣表
     const weightCache = {};
     function initHashCache() {
       mainProducts.forEach(main => {
@@ -258,11 +264,10 @@
 
     let cart = [];
     let filteredListCache = [];
-    let renderCount = 20;       // 虛擬視窗初始渲染 20 筆
+    let renderCount = 20;
     let isBatchLoading = false;
     let debounceTimer = null;
 
-    // 防抖機制 (Debounce)
     function debouncedCalculate() {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
@@ -289,17 +294,22 @@
       document.getElementById("budgetValue").innerText = `NT$ ${parseInt(budget).toLocaleString()}`;
     }
 
-    function showToast(message) {
-      const toast = document.getElementById("budgetToast");
-      document.getElementById("toastMessage").innerText = message;
+    // 超預算彈出小視窗邏輯
+    function openBudgetModal(productName, productPrice, currentBudget) {
+      const modal = document.getElementById("budgetAlertModal");
+      const msg = document.getElementById("alertModalMessage");
+      msg.innerHTML = `商品「<strong>${productName}</strong>」金額為 <span class="text-rose-600 font-bold">NT$ ${productPrice.toLocaleString()}</span>，已超過設定的單品預算上限 <span class="text-indigo-600 font-bold">NT$ ${currentBudget.toLocaleString()}</span>！`;
       
-      toast.classList.remove("opacity-0", "pointer-events-none", "translate-y-[-10px]");
-      toast.classList.add("opacity-100", "translate-y-0");
+      modal.classList.remove("opacity-0", "pointer-events-none");
+      modal.querySelector(".id-modal-card").classList.remove("scale-95");
+      modal.querySelector(".id-modal-card").classList.add("scale-100");
+    }
 
-      setTimeout(() => {
-        toast.classList.remove("opacity-100", "translate-y-0");
-        toast.classList.add("opacity-0", "pointer-events-none", "translate-y-[-10px]");
-      }, 3500);
+    function closeBudgetModal() {
+      const modal = document.getElementById("budgetAlertModal");
+      modal.classList.add("opacity-0", "pointer-events-none");
+      modal.querySelector(".id-modal-card").classList.remove("scale-100");
+      modal.querySelector(".id-modal-card").classList.add("scale-95");
     }
 
     function onMainProductChange() {
@@ -322,7 +332,7 @@
         cart.splice(existingIndex, 1);
       } else {
         if (product.price > budget) {
-          showToast(`「${product.name}」單價為 NT$ ${product.price.toLocaleString()}，已超過設定的預算上限 (NT$ ${budget.toLocaleString()})！`);
+          openBudgetModal(product.name, product.price, budget);
           return;
         }
         cart.push({ ...product, category: "Accessory" });
@@ -355,7 +365,7 @@
             </div>
             <div class="flex items-center gap-3">
               <span class="font-semibold">NT$ ${item.price.toLocaleString()}</span>
-              ${!isMain ? `<button onclick="toggleCart('${item.id}')" class="text-rose-300 hover:text-rose-100 text-xs">✕ 移除</button>` : ''}
+              ${!isMain ? `<button onclick="toggleCart('${item.id}')" class="text-rose-300 hover:text-rose-100 text-xs cursor-pointer">✕ 移除</button>` : ''}
             </div>
           </div>
         `;
@@ -426,7 +436,7 @@
     }
 
     // -------------------------------------------------------------
-    // 3. 核心運算與可視區動態載入 (Virtual Windowing)
+    // 3. 核心運算與可視區動態載入
     // -------------------------------------------------------------
     function calculateRecommendations() {
       const selectedMainId = document.getElementById("primaryProductSelect").value;
