@@ -65,7 +65,7 @@
           <i data-lucide="shopping-bag"></i> 跨領域智慧商品關聯推薦系統
         </h1>
         <p class="text-indigo-200 mt-1 text-sm">
-          應用離散數學：100款主商品 × 800款配件矩陣 + 全域零重複防撞演算法
+          應用離散數學：100款主商品 (全獨立不重複) × 800款配件矩陣
         </p>
       </div>
       <!-- 右上角購物車圖案與品項按鈕 -->
@@ -118,8 +118,8 @@
         <div class="font-bold text-sm text-indigo-700 border-b border-indigo-200 pb-1 flex items-center gap-1">
           <i data-lucide="brain-circuit" class="w-4 h-4"></i> 唯一性集合生成 (Unique Set)
         </div>
-        <p><strong>• 全域防撞驗證:</strong> 確保 100 款主商品與 800 款配件名稱及價格皆 100% 互異。</p>
-        <p><strong>• 高效能虛擬視窗:</strong> 結合 $O(1)$ 雜湊快取與動態渲染，確保極致 60 FPS。</p>
+        <p><strong>• 全域防撞驗證:</strong> 100 款主商品與 800 款配件名稱及價格皆經嚴格檢查，100% 互異。</p>
+        <p><strong>• 高效能虛擬視窗:</strong> 結合 O(1) 雜湊快取與動態渲染，確保極致 60 FPS。</p>
       </div>
 
     </section>
@@ -204,75 +204,115 @@
 
   <script>
     // -------------------------------------------------------------
-    // 1. 10大跨領域商品矩陣資料庫 (支援 100 款主商品 & 800 款配件全域零重複)
+    // 1. 10大跨領域商品矩陣資料庫 (內含 100 款絕對獨立的主商品模型)
     // -------------------------------------------------------------
     const categoryData = [
       {
         name: "3C數碼", img: "💻",
-        mainModels: ["極光旗艦電競筆電", "全能創作者雙螢幕主機", "頂規商務行動工作站", "次世代光追桌機", "OLED 觸控變形筆電", "極致輕薄行動超極本", "全金屬創作者桌機", "沉浸式VR旗艦主機", "AI 深度學習工作站", "極速效能電競主機"],
+        mainModels: [
+          "極光旗艦電競筆電", "全能創作者雙螢幕主機", "頂規商務行動工作站", "次世代光追桌機", "OLED 觸控變形筆電", 
+          "極致輕薄行動超極本", "全金屬創作者桌機", "沉浸式VR旗艦主機", "AI 深度學習工作站", "極速效能電競主機"
+        ],
+        mainBrands: ["ROG 玩家共和國", "Logitech G", "Razer 雷蛇", "Corsair 海盜船", "MSI 微星", "Apple 蘋果", "Samsung 三星", "Sony 索尼", "Dell 戴爾", "ASUS 華碩"],
         brands: ["ROG", "Logitech", "Razer", "Corsair", "MSI", "Apple", "Samsung", "Sony", "Dell", "ASUS", "HyperX", "JBL", "Anker", "Belkin", "CalDigit"],
         specs: ["27吋 4K", "RGB 機械", "三模無線", "主動降噪", "10合1", "磁吸金屬", "高速行動", "25000mAh", "智慧自動", "多平台藍牙", "極速電競", "超薄便攜", "專業創作者", "軍規防摔", "旗艦特仕"],
         cores: ["電競螢幕", "青軸鍵盤", "電競滑鼠", "藍牙耳機", "Type-C集線器", "筆電支架", "外接固態硬碟", "雙向快充行動電源", "螢幕掛燈", "無線遊戲手把", "環繞藍牙喇叭", "專業繪圖板", "Wi-Fi 7路由器", "水冷散熱器", "高速記憶卡", "4K視訊鏡頭", "編織轉接線", "防摔保護殼", "抗藍光貼", "指向性麥克風"]
       },
       {
         name: "生活家電", img: "☕",
-        mainModels: ["旗艦智慧聯網冷氣機", "全自動頂級洗脫烘滾筒洗衣機", "AI 智慧雙迴路對開冰箱", "極智感應美型變頻洗衣機", "日本原裝多門極鮮冷藏櫃", "全能蒸烘洗碗機旗艦款", "頂級智慧滾筒洗脫烘", "旗艦變頻冷暖空調機", "全自動智慧溫控乾衣機", "高階智能冷藏保鮮冰箱"],
+        mainModels: [
+          "旗艦智慧聯網冷氣機", "全自動頂級洗脫烘滾筒洗衣機", "AI 智慧雙迴路對開冰箱", "極智感應美型變頻洗衣機", "日本原裝多門極鮮冷藏櫃", 
+          "全能蒸烘洗碗機旗艦款", "頂級智慧滾筒洗脫烘", "旗艦變頻冷暖空調機", "全自動智慧溫控乾衣機", "高階智能冷藏保鮮冰箱"
+        ],
+        mainBrands: ["Dyson 戴森", "BALMUDA 巴慕達", "IRIS 歐愛麗", "BRUNO 美型", "DeLonghi 迪朗奇", "Panasonic 國際牌", "HITACHI 日立", "PHILIPS 飛利浦", "SHARP 夏普", "TOSHIBA 東芝"],
         brands: ["Dyson", "BALMUDA", "IRIS", "BRUNO", "DeLonghi", "Panasonic", "HITACHI", "PHILIPS", "SHARP", "TOSHIBA", "Zojirushi", "Tiger", "Braun", "Ecovacs", "Roborock"],
         specs: ["智慧自動", "日系美型", "無線手持", "循環極靜音", "負離子高速", "智能恆溫", "多功能全自動", "UV紫外線", "桌上型迷你", "超音波香氛", "雙重過濾", "節能省電", "極速加熱", "殺菌烘乾", "負離子淨化"],
         cores: ["義式咖啡機", "蒸氣烤箱", "無線吸塵器", "立式電風扇", "美髮吹風機", "恆溫電熱水壺", "製冰機", "烘鞋除菌機", "空氣清淨機", "加濕香氛機", "除濕乾燥機", "微波料理爐", "全營養果汁機", "音波電動牙刷", "智慧掃地機", "料理電子秤", "光觸媒捕蚊燈", "陶瓷電暖器", "手持掛燙機", "櫥下淨水器"]
       },
       {
         name: "戶外露營", img: "⛺",
-        mainModels: ["專業極地四季高山帳篷", "豪華車宿露營越野拖車", "頂級全天候隧道式露營帳", "多功能自動速開別墅帳", "極地防寒高規露營車屋", "全鋁合金輕量露營拖車", "豪華四季家庭式露營帳", "高山極地重裝抗風帳篷", "專業戶外露營遮陽大天幕", "頂級多功能車泊露營帳"],
+        mainModels: [
+          "專業極地四季高山帳篷", "豪華車宿露營越野拖車", "頂級全天候隧道式露營帳", "多功能自動速開別墅帳", "極地防寒高規露營車屋", 
+          "全鋁合金輕量露營拖車", "豪華四季家庭式露營帳", "高山極地重裝抗風帳篷", "專業戶外露營遮陽大天幕", "頂級多功能車泊露營帳"
+        ],
+        mainBrands: ["Snow Peak", "Coleman 柯曼", "Thule 都樂", "Black Diamond", "Nordisk 北歐", "Logos 樂高士", "Naturehike 挪客", "KZM 戶外", "Helinox 輕量", "MSR 極地"],
         brands: ["Snow Peak", "Coleman", "Thule", "Black Diamond", "Nordisk", "Logos", "Naturehike", "KZM", "Helinox", "MSR", "Petzl", "GSI", "Osprey", "Patagonia", "Columbia"],
         specs: ["輕量化鈦金", "荷蘭鑄鐵", "高亮度 LED", "一房一廳", "鋁合金摺疊", "高密度發泡", "便攜戶外", "大容量保溫", "防水防潮", "多功能工兵", "極地防寒", "防風抗UV", "快乾透氣", "超輕量", "重裝防護"],
         cores: ["雙層登山杯", "鍋具組", "露營氛圍燈", "露營帳篷", "蛋捲桌", "隔音睡墊", "瓦斯爐", "冰桶保溫箱", "防潮野餐墊", "摺疊圓鍬", "羽絨睡袋", "天幕遮陽帳", "碳纖維登山杖", "鋁合金折疊椅", "焚火架", "強光頭燈", "多功能求生刀", "戶外濾水器", "急救醫療包", "強力掛繩組"]
       },
       {
         name: "汽機車百貨", img: "🚗",
-        mainModels: ["智慧 AI 全景環景導航系統", "頂級車載娛樂影音中控主機", "旗艦級前後雙錄行車紀錄器", "車用智慧 AI 語音控制主機", "全功能車聯網行車安全系統", "頂規車載無線多媒體中控台", "智慧型車用防盜安全中心", "極速車載導航影音娛樂系統", "車用頂級環景影像行車系統", "旗艦車用智慧互聯中控主機"],
+        mainModels: [
+          "智慧 AI 全景環景導航系統", "頂級車載娛樂影音中控主機", "旗艦級前後雙錄行車紀錄器", "車用智慧 AI 語音控制主機", "全功能車聯網行車安全系統", 
+          "頂規車載無線多媒體中控台", "智慧型車用防盜安全中心", "極速車載導航影音娛樂系統", "車用頂級環景影像行車系統", "旗艦車用智慧互聯中控主機"
+        ],
+        mainBrands: ["Garmin 佳明", "Mio 宇達電通", "70mai 七十邁", "BASEUS 倍思", "3M 車用", "SONAX 德國", "SHARK 鯊魚", "BLACK+DECKER", "Bridgestone", "Michelin 輪胎"],
         brands: ["Garmin", "Mio", "70mai", "BASEUS", "3M", "SONAX", "SHARK", "BLACK+DECKER", "Bridgestone", "Michelin", "Bosch", "Hella", "Pioneer", "Alpine", "Meguiar's"],
         specs: ["高清夜視", "磁吸無線", "車用多功能", "奈米防潑水", "重低音車載", "胎壓偵測", "車用救援", "人體工學腰靠", "超強吸力", "LED矩陣", "極速快充", "環景顯影", "抗UV隔熱", "防撞緩衝", "全天候防護"],
         cores: ["行車記錄器", "手機導航架", "負離子空氣清淨機", "車身鍍膜組", "藍牙喇叭音響", "胎壓偵測器", "行動電源啟動器", "車用腰靠墊", "手持吸塵器", "車室氣氛燈", "真皮方向盤套", "椅背收納袋", "磁吸遮陽簾", "車用安全錘", "智慧點菸器", "天然香氛罐", "全包覆椅套", "應急三角錐", "超細纖維洗車巾", "數位胎壓計"]
       },
       {
         name: "音樂樂器", img: "🎸",
-        mainModels: ["頂級專業演奏級平台鋼琴", "手工特製全單板木吉他", "旗艦級 88 鍵數位電鋼琴", "專業錄音室立式演奏鋼琴", "頂級手工電吉他旗艦款", "演奏級桃花心木民謠吉他", "旗艦級專業舞台電子琴", "手工特製頂級古典吉他", "專業錄音室旗艦電鋼琴", "大師級演奏用平台鋼琴"],
+        mainModels: [
+          "頂級專業演奏級平台鋼琴", "手工特製全單板木吉他", "旗艦級 88 鍵數位電鋼琴", "專業錄音室立式演奏鋼琴", "頂級手工電吉他旗艦款", 
+          "演奏級桃花心木民謠吉他", "旗艦級專業舞台電子琴", "手工特製頂級古典吉他", "專業錄音室旗艦電鋼琴", "大師級演奏用平台鋼琴"
+        ],
+        mainBrands: ["Yamaha 山葉", "Fender 芬達", "Gibson 吉布森", "Roland 羅蘭", "Korg 科音", "Boss 效果器", "Shure 舒爾", "Sennheiser 森海", "Martin 馬丁", "Ibanez 依班斯"],
         brands: ["Yamaha", "Fender", "Gibson", "Roland", "Korg", "Boss", "Shure", "Sennheiser", "Martin", "Ibanez", "Epiphone", "Taylor", "Zildjian", "Pearl", "Audio-Technica"],
         specs: ["桃花心木", "專業導線", "多功能數位", "吉他專用", "錄音室專業", "耳罩監聽", "實木調音", "防潮電子", "金屬保養", "可攜式譜架", "手工特製", "舞台專用", "錄音級", "低延遲", "發燒友級"],
         cores: ["移調夾", "樂器導線", "節拍器", "壁掛架", "防噴罩", "監聽耳機", "調音器", "琴箱保護套", "潤滑保養組", "折疊琴譜架", "真皮吉他背帶", "綜合效果器", "琴頭收納包", "琴頸支架", "木吉他撥片盒", "爵士鼓地毯", "導線魔鬼氈", "節奏訓練機", "升降鋼琴椅", "樂器吹嘴刷"]
       },
       {
         name: "運動健身", img: "🏋️",
-        mainModels: ["商用級多功能智慧跑步機", "重訓室旗艦綜合訓練機", "全功能專業商用橢圓機", "頂級智慧磁控健身車", "多功能重訓綜合力量站", "商用旗艦級電動跑步機", "全方位智慧交叉訓練機", "頂規商用重訓深蹲架組", "專業多功能有氧健身車", "旗艦級商用綜合訓練台"],
+        mainModels: [
+          "商用級多功能智慧跑步機", "重訓室旗艦綜合訓練機", "全功能專業商用橢圓機", "頂級智慧磁控健身車", "多功能重訓綜合力量站", 
+          "商用旗艦級電動跑步機", "全方位智慧交叉訓練機", "頂規商用重訓深蹲架組", "專業多功能有氧健身車", "旗艦級商用綜合訓練台"
+        ],
+        mainBrands: ["Nike 耐吉", "Under Armour", "Adidas 愛迪達", "Decathlon 迪卡儂", "TriggerPoint", "Theragun 按摩槍", "Bowflex", "Manduka 曼朱卡", "Reebok", "PUMA 運動"],
         brands: ["Nike", "Under Armour", "Adidas", "Decathlon", "TriggerPoint", "Theragun", "Bowflex", "Manduka", "Reebok", "PUMA", "Garmin", "Fitbit", "Speedo", "Arena", "Wilson"],
         specs: ["專業高密度", "可調重力", "防滑舉重", "高彈力乳膠", "智慧計數", "大容量運動", "筋膜深層", "多功能懸吊", "核心訓練", "運動防護", "極速燃脂", "吸濕排汗", "人體工學", "無重力", "強力支撐"],
         cores: ["瑜珈墊", "啞鈴組合", "舉重訓練手套", "阻力訓練帶", "跳繩", "太空瓶", "按摩槍", "懸吊訓練帶", "健腹輪", "護膝套", "韻律抗力球", "門上引體向上桿", "多功能壺鈴", "運動吸汗毛巾", "核心滑盤", "拳擊手靶", "深層筋膜球", "專業握力器", "彈力拉力繩", "瘦身呼啦圈"]
       },
       {
         name: "廚房衛浴", img: "🍳",
-        mainModels: ["歐式智慧嵌入式蒸烤爐", "頂級智慧恆溫按摩浴缸", "全功能旗艦洗碗烘碗機", "智慧感應控溫抽油煙機", "頂規智能雙口IH爐具", "歐系美型嵌入式烘焙烤箱", "豪華多功能按摩淋浴柱", "全自動智慧控溫洗碗機", "頂級雙口智慧IH電磁爐", "旗艦嵌入式蒸氣料理爐"],
+        mainModels: [
+          "歐式智慧嵌入式蒸烤爐", "頂級智慧恆溫按摩浴缸", "全功能旗艦洗碗烘碗機", "智慧感應控溫抽油煙機", "頂規智能雙口IH爐具", 
+          "歐系美型嵌入式烘焙烤箱", "豪華多功能按摩淋浴柱", "全自動智慧控溫洗碗機", "頂級雙口智慧IH電磁爐", "旗艦嵌入式蒸氣料理爐"
+        ],
+        mainBrands: ["Zwilling 雙人", "T-fal 特福", "Le Creuset", "WMF 德國", "OXO 好好用", "KOHLER 科勒", "TOTO 衛浴", "HCG 和成", "Lock&Lock", "Thermos 膳魔師"],
         brands: ["Zwilling", "T-fal", "Le Creuset", "WMF", "OXO", "KOHLER", "TOTO", "HCG", "Lock&Lock", "Thermos", "Tiger", "Britta", "Cuisinart", "KitchenAid", "Emile Henry"],
         specs: ["職人手工", "不沾陶瓷", "食品級矽膠", "多功能料理", "不鏽鋼雙層", "自動感應", "強力吸盤", "北歐風陶瓷", "防滑吸水", "節水省水", "抗菌防霉", "真空保溫", "高效過濾", "耐熱防爆", "極簡美學"],
         cores: ["菜刀組", "平底鍋", "耐熱鍋鏟", "料理電子秤", "保鮮盒組", "給皂機", "吹風機架", "衛浴五件套", "吸水地墊", "蓮蓬頭", "調味收納罐", "水槽瀝水籃", "天然木砧板", "多功能刨絲器", "真空保溫瓶", "磁吸牙刷架", "無死角馬桶刷", "毛巾置物桿", "水槽濾網", "智慧烘碗架"]
       },
       {
         name: "攝影影音", img: "📷",
-        mainModels: ["全片幅旗艦數位單眼相機", "專業 8K 電影級攝影機", "中片幅頂規專業攝影機", "旗艦無反光鏡數位相機", "專業廣電級 4K 攝影機", "全片幅無反旗艦攝影機", "頂級電影級數位攝錄影機", "專業數位單眼旗艦相機", "廣播級 4K 數位攝影機", "全片幅頂規無反相機"],
+        mainModels: [
+          "全片幅旗艦數位單眼相機", "專業 8K 電影級攝影機", "中片幅頂規專業攝影機", "旗艦無反光鏡數位相機", "專業廣電級 4K 攝影機", 
+          "全片幅無反旗艦攝影機", "頂級電影級數位攝錄影機", "專業數位單眼旗艦相機", "廣播級 4K 數位攝影機", "全片幅頂規無反相機"
+        ],
+        mainBrands: ["Manfrotto 曼富圖", "Gitzo 捷信", "Benro 百諾", "Peak Design", "Lowepro 樂攝寶", "Rode 羅德", "DJI 大疆", "Godox 神牛", "Sandisk 閃迪", "PolarPro"],
         brands: ["Manfrotto", "Gitzo", "Benro", "Peak Design", "Lowepro", "Rode", "DJI", "Godox", "Sandisk", "PolarPro", "SmallRig", "Zhiyun", "Atomos", "Nisi", "Kenko"],
         specs: ["碳纖維輕量", "專業防潮", "V90高速", "環形補光", "減光濾鏡", "無線領夾", "攝影師專用", "快速拆裝", "三軸穩定", "鏡頭清潔", "電影級", "大光圈", "超廣角", "防手震", "旗艦級"],
         cores: ["三腳架", "電子防潮箱", "記憶卡", "補光燈", "鏡片組", "麥克風", "後背包", "背帶組", "雲台", "清潔組", "反光板組", "攝影棚燈", "電子快門線", "相機內膽包", "柔光罩", "微距鏡片", "熱靴水平儀", "鋰電池", "雙槽充電器", "減壓背帶"]
       },
       {
         name: "辦公文具", img: "✏️",
-        mainModels: ["頂級人體工學電動升降桌", "德國精工主管真皮辦公椅", "旗艦級人體工學辦公椅", "全功能智慧電動升降辦公桌", "頂規人體工學網布主管椅", "商務旗艦電動升降工作桌", "頂級主管專用真皮辦公椅", "全功能人體工學電腦椅", "旗艦商務電動升降辦公桌", "頂級人體工學網椅系列"],
+        mainModels: [
+          "頂級人體工學電動升降桌", "德國精工主管真皮辦公椅", "旗艦級人體工學辦公椅", "全功能智慧電動升降辦公桌", "頂規人體工學網布主管椅", 
+          "商務旗艦電動升降工作桌", "頂級主管專用真皮辦公椅", "全功能人體工學電腦椅", "旗艦商務電動升降辦公桌", "頂級人體工學網椅系列"
+        ],
+        mainBrands: ["3M 辦公", "Kokuyo 國譽", "Pentel 派通", "Muji 無印", "Brother 兄弟", "Dahle 德勒", "Faber-Castell", "Pilot 百樂", "Staedtler 施德樓", "Zebra 斑馬"],
         brands: ["3M", "Kokuyo", "Pentel", "Muji", "Brother", "Dahle", "Faber-Castell", "Pilot", "Staedtler", "Zebra", "Parker", "Waterman", "Moleskine", "Leuchtturm1917", "Rhodia"],
         specs: ["磁吸桌面整線", "多功能筆筒", "人體工學護腕", "LED護眼", "無線簡報", "萬用轉接", "精美皮革", "精密螺絲起", "強力磁鐵", "檔案收納", "高效省力", "極簡風", "商務專用", "防偽防盜", "環保再生"],
         cores: ["理線器", "收納盒", "滑鼠墊", "檯燈", "簡報筆", "轉接頭", "桌墊", "螺絲起子組", "白板", "公事包", "省力訂書機", "不鏽鋼剪刀", "多功能美工刀", "膠帶切割台", "公文夾", "便利貼", "按壓簽字筆", "商用計算機", "自動碎紙機", "電動打孔機"]
       },
       {
         name: "美妝保健", img: "💄",
-        mainModels: ["頂級智慧光療美膚艙", "專業負離子水護髮養生艙", "全方位智慧美顏抗老艙", "旗艦級光子嫩膚美容艙", "頂規頭皮養護水療SPA機", "全能智慧無瑕美肌美膚艙", "頂級負離子活氧美顏艙", "旗艦級光療養生美膚機", "專業智慧水氧抗老美顏艙", "頂規負離子頭皮養護艙"],
+        mainModels: [
+          "頂級智慧光療美膚艙", "專業負離子水護髮養生艙", "全方位智慧美顏抗老艙", "旗艦級光子嫩膚美容艙", "頂規頭皮養護水療SPA機", 
+          "全能智慧無瑕美肌美膚艙", "頂級負離子活氧美顏艙", "旗艦級光療養生美膚機", "專業智慧水氧抗老美顏艙", "頂規負離子頭皮養護艙"
+        ],
+        mainBrands: ["Panasonic 美容", "Refa 日本", "Foreo 瑞典", "Braun 德國", "Philips 美容", "Innisfree", "Shiseido 資生堂", "Lancome 蘭蔻", "Estee Lauder", "DHC 保健"],
         brands: ["Panasonic", "Refa", "Foreo", "Braun", "Philips", "Innisfree", "Shiseido", "Lancome", "Estee Lauder", "DHC", "Kose", "Clinique", "Clarins", "L'occitane", "Aesop"],
         specs: ["LED智能", "大容量化妝", "負離子直捲", "電動美甲", "超音波洗臉", "隨身香水", "旅行收納", "草本精油", "保濕奈米", "竹炭溫感", "深層修護", "無瑕透亮", "植萃舒緩", "極效抗老", "微導循環"],
         cores: ["化妝鏡", "收納盒", "美髮梳", "修護器", "洗臉刷", "分裝瓶", "盥洗包", "滾珠瓶", "蒸臉機", "眼罩", "氣墊粉撲", "修眉刀組", "黑頭拔除儀", "光療美甲燈", "身體潤膚乳", "護手霜", "隨身維他命盒", "刮痧按摩板", "頭皮按摩梳", "造型髮夾組"]
@@ -282,29 +322,38 @@
     const mainProducts = [];
     const accessories = [];
     const usedMainNamesSet = new Set();
+    const usedMainPricesSet = new Set();
     const usedNamesSet = new Set();
     const usedPricesSet = new Set();
 
-    // 1. 生成 100 款絕對不重複的主商品名稱與價格
+    // 1. 生成 100 款「名稱與價格絕對不重複」的主商品
     let mainIndex = 1;
     for (let catId = 0; catId < categoryData.length; catId++) {
       const cat = categoryData[catId];
       for (let k = 0; k < 10; k++) {
         let mainName = "";
         let attempt = 0;
+
         do {
-          const model = cat.mainModels[(k + attempt * 3) % cat.mainModels.length];
-          const brand = cat.brands[(k + attempt * 5) % cat.brands.length];
-          mainName = `${brand}｜${model}${attempt > 0 ? ` (${attempt + 1})` : ''}`;
+          const model = cat.mainModels[k]; // 10 個固定不重複的型號
+          const brand = cat.mainBrands[(k + attempt * 3) % cat.mainBrands.length];
+          mainName = `${brand}｜${model}${attempt > 0 ? ` [V${attempt + 1}]` : ''}`;
           attempt++;
         } while (usedMainNamesSet.has(mainName));
 
         usedMainNamesSet.add(mainName);
 
+        // 確保主商品金額絕對不重複
+        let mainPrice = 12000 + (mainIndex * 431) + ((mainIndex * 79) % 15000);
+        while (usedMainPricesSet.has(mainPrice)) {
+          mainPrice += 17;
+        }
+        usedMainPricesSet.add(mainPrice);
+
         mainProducts.push({
           id: `P${String(mainIndex).padStart(3, '0')}`,
           name: mainName,
-          price: 15000 + (mainIndex * 850),
+          price: mainPrice,
           catId: catId,
           img: cat.img
         });
@@ -312,7 +361,7 @@
       }
     }
 
-    // 2. 生成 800 款絕對不重複的配件名稱與價格
+    // 2. 生成 800 款「名稱與價格絕對不重複」的配件
     let globalIndex = 1;
     for (let catId = 0; catId < categoryData.length; catId++) {
       const cat = categoryData[catId];
