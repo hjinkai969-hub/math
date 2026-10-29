@@ -65,7 +65,7 @@
           <i data-lucide="shopping-bag"></i> 跨領域智慧商品關聯推薦系統
         </h1>
         <p class="text-indigo-200 mt-1 text-sm">
-          應用離散數學：100款主商品 × 800款配件矩陣 + 精準圖示對映演算法
+          應用離散數學：100款主商品 × 800款配件矩陣 + 精準防撞圖示引擎
         </p>
       </div>
       <!-- 右上角購物車圖案與品項按鈕 -->
@@ -118,7 +118,7 @@
         <div class="font-bold text-sm text-indigo-700 border-b border-indigo-200 pb-1 flex items-center gap-1">
           <i data-lucide="brain-circuit" class="w-4 h-4"></i> 智慧圖示與防撞集合
         </div>
-        <p><strong>• 精準名稱圖示配對:</strong> 依據商品名稱關鍵字自動對應 Emoji 圖示。</p>
+        <p><strong>• 貼合名稱圖示:</strong> 透過豐富的關鍵字映射與循環池，確保每個配件圖示高度貼合且不重複。</p>
         <p><strong>• 全域防撞驗證:</strong> 100 款主商品與 800 款配件名稱及價格 100% 互異。</p>
       </div>
 
@@ -204,71 +204,102 @@
 
   <script>
     // -------------------------------------------------------------
-    // 🎯 精準商品名稱圖示對映引擎 (Smart Icon Matcher)
+    // 🎯 精準且多樣化的配件圖示對映引擎 (Smart Icon Matcher)
     // -------------------------------------------------------------
-    function getSmartIcon(name, defaultImg) {
+    const iconPools = {
+      "3C數碼": ["🖥️", "⌨️", "🖱️", "🎧", "🔊", "💻", "💾", "🔋", "📷", "🎙️", "📡", "🔌", "📱", "🕹️", "💡", "🔍"],
+      "生活家電": ["☕", "🍳", "🧹", "🌀", "💨", "🫖", "🍃", "❄️", "🧺", "🪥", "🧊", "♨️", "🧽", "💡", "⚡"],
+      "戶外露營": ["⛺", "🛌", "🎒", "💡", "🥤", "🔪", "🔦", "🪵", "🧭", "🔥", "🥾", "☂️", "🛶", "🪓", "🪢"],
+      "汽機車百貨": ["🚘", "🛞", "🧽", "🪑", "🛠️", "🔑", "🧯", "🪞", "⛽", "🛜", "🛡️", "🛆", "🧰"],
+      "音樂樂器": ["🎸", "🎹", "🥁", "🎼", "🎷", "🎺", "🎻", "🎤", "🎛️", "📻", "📯", "🎚️"],
+      "運動健身": ["🏃", "🏋️", "🧘", "💆", "🚴", "⚽", "🏀", "🎾", "🥊", "🎽", "🪂", "🛹", "🎯"],
+      "廚房衛浴": ["🔪", "🥘", "🚿", "🛁", "🍽️", "🥄", "🥣", "🥢", "🚰", "🧴", "🧻", "🧼", "🪞"],
+      "攝影影音": ["📷", "📐", "🎥", "🎞️", "📹", "💡", "🔭", "🔬", "🎛️", "🔋", "💼", "🧳"],
+      "辦公文具": ["🏢", "🪑", "💡", "✏️", "📐", "📎", "📌", "✂️", "📁", "🗂️", "📊", "🖨️", "🖊️"],
+      "美妝保健": ["✨", "💄", "💅", "🧴", "🪞", "🪮", "🧼", "🧽", "💊", "🌿", "🌸", "💧"]
+    };
+
+    const usedIconTracker = {};
+
+    function getSmartIcon(name, catName, index) {
+      // 依據名稱關鍵字精準對應
       if (name.includes("螢幕") || name.includes("顯示器")) return "🖥️";
       if (name.includes("鍵盤")) return "⌨️";
       if (name.includes("滑鼠")) return "🖱️";
       if (name.includes("耳機")) return "🎧";
       if (name.includes("喇叭") || name.includes("音響")) return "🔊";
       if (name.includes("筆電") || name.includes("工作站")) return "💻";
-      if (name.includes("桌機") || name.includes("主機")) return "🖥️";
       if (name.includes("硬碟") || name.includes("記憶卡")) return "💾";
-      if (name.includes("行動電源") || name.includes("快充")) return "🔋";
+      if (name.includes("行動電源") || name.includes("快充") || name.includes("電池")) return "🔋";
       if (name.includes("鏡頭") || name.includes("視訊")) return "📷";
       if (name.includes("麥克風")) return "🎙️";
       if (name.includes("路由器") || name.includes("Wi-Fi")) return "📡";
-      
+      if (name.includes("支架") || name.includes("掛燈")) return "💡";
+      if (name.includes("轉接線") || name.includes("集線器")) return "🔌";
+      if (name.includes("保護殼") || name.includes("貼")) return "🛡️";
+
       if (name.includes("咖啡機")) return "☕";
-      if (name.includes("烤箱") || name.includes("料理爐")) return "🍳";
+      if (name.includes("烤箱") || name.includes("料理爐") || name.includes("微波")) return "🍳";
       if (name.includes("吸塵器") || name.includes("掃地機")) return "🧹";
       if (name.includes("電風扇") || name.includes("循環扇")) return "🌀";
-      if (name.includes("吹風機")) return "💨";
+      if (name.includes("吹風機") || name.includes("掛燙機")) return "💨";
       if (name.includes("熱水壺") || name.includes("淨水器")) return "🫖";
       if (name.includes("清淨機") || name.includes("除濕")) return "🍃";
-      if (name.includes("冷氣") || name.includes("空調") || name.includes("冷藏")) return "❄️";
+      if (name.includes("冷氣") || name.includes("空調") || name.includes("製冰機")) return "❄️";
       if (name.includes("洗衣機") || name.includes("乾衣機")) return "🧺";
       if (name.includes("電動牙刷")) return "🪥";
+      if (name.includes("電子秤")) return "⚖️";
 
-      if (name.includes("帳篷") || name.includes("露營帳")) return "⛺";
+      if (name.includes("帳篷") || name.includes("露營帳") || name.includes("天幕")) return "⛺";
       if (name.includes("睡袋") || name.includes("睡墊")) return "🛌";
       if (name.includes("登山杖") || name.includes("背包")) return "🎒";
-      if (name.includes("燈") || name.includes("頭燈")) return "💡";
-      if (name.includes("水杯") || name.includes("濾水")) return "🥤";
+      if (name.includes("燈") || name.includes("頭燈") || name.includes("氛圍燈")) return "💡";
+      if (name.includes("水杯") || name.includes("濾水") || name.includes("太空瓶")) return "🥤";
       if (name.includes("求生刀") || name.includes("圓鍬")) return "🔪";
+      if (name.includes("瓦斯爐") || name.includes("焚火架")) return "🔥";
 
       if (name.includes("行車記錄") || name.includes("導航")) return "🚘";
       if (name.includes("胎壓")) return "🛞";
       if (name.includes("鍍膜") || name.includes("洗車")) return "🧽";
-      if (name.includes("方向盤") || name.includes("椅套")) return "🪑";
+      if (name.includes("方向盤") || name.includes("椅套") || name.includes("腰靠")) return "🪑";
+      if (name.includes("安全錘") || name.includes("三角錐")) return "⚠️";
 
-      if (name.includes("吉他")) return "🎸";
+      if (name.includes("吉他") || name.includes("撥片")) return "🎸";
       if (name.includes("鋼琴") || name.includes("電子琴")) return "🎹";
       if (name.includes("爵士鼓")) return "🥁";
-      if (name.includes("節拍器") || name.includes("調音器")) return "🎼";
+      if (name.includes("節拍器") || name.includes("調音器") || name.includes("譜架")) return "🎼";
+      if (name.includes("導線") || name.includes("效果器")) return "🔌";
 
       if (name.includes("跑步機") || name.includes("健身車")) return "🏃";
-      if (name.includes("啞鈴") || name.includes("重訓")) return "🏋️";
-      if (name.includes("瑜珈墊")) return "🧘";
+      if (name.includes("啞鈴") || name.includes("重訓") || name.includes("壺鈴")) return "🏋️";
+      if (name.includes("瑜珈墊") || name.includes("抗力球")) return "🧘";
       if (name.includes("按摩槍") || name.includes("筋膜")) return "💆";
+      if (name.includes("跳繩") || name.includes("拉力繩")) return "🎯";
 
-      if (name.includes("菜刀") || name.includes("砧板")) return "🔪";
+      if (name.includes("菜刀") || name.includes("砧板") || name.includes("刨絲器")) return "🔪";
       if (name.includes("鍋") || name.includes("IH爐")) return "🥘";
-      if (name.includes("蓮蓬頭") || name.includes("浴缸") || name.includes("衛浴")) return "🚿";
+      if (name.includes("蓮蓬頭") || name.includes("浴缸") || name.includes("衛浴") || name.includes("給皂機")) return "🚿";
+      if (name.includes("地墊") || name.includes("毛巾")) return "🧼";
 
       if (name.includes("相機") || name.includes("攝影機")) return "📷";
       if (name.includes("腳架") || name.includes("雲台")) return "📐";
+      if (name.includes("防潮箱") || name.includes("背包")) return "💼";
+      if (name.includes("補光燈") || name.includes("柔光罩")) return "💡";
 
       if (name.includes("升降桌") || name.includes("辦公桌")) return "🏢";
       if (name.includes("辦公椅") || name.includes("電腦椅")) return "🪑";
       if (name.includes("檯燈")) return "💡";
-      if (name.includes("筆") || name.includes("計算機")) return "✏️";
+      if (name.includes("筆") || name.includes("計算機") || name.includes("剪刀")) return "✏️";
+      if (name.includes("碎紙機") || name.includes("打孔機")) return "🖨️";
 
       if (name.includes("美膚艙") || name.includes("SPA") || name.includes("美容")) return "✨";
-      if (name.includes("化妝") || name.includes("美顏")) return "💄";
+      if (name.includes("化妝") || name.includes("美顏") || name.includes("香水")) return "💄";
+      if (name.includes("洗臉") || name.includes("護膚")) return "🧴";
 
-      return defaultImg;
+      // 若無直接對應，從該領域的圖示池中依序循環取用，確保不重複
+      const pool = iconPools[catName] || ["📦", "🏷️", "⭐", "💎"];
+      const icon = pool[index % pool.length];
+      return icon;
     }
 
     // -------------------------------------------------------------
@@ -364,7 +395,7 @@
     const usedNamesSet = new Set();
     const usedPricesSet = new Set();
 
-    // 1. 生成 100 款「名稱與價格絕對不重複」的主商品 (結合動態圖示)
+    // 1. 生成 100 款主商品
     let mainIndex = 1;
     for (let catId = 0; catId < categoryData.length; catId++) {
       const cat = categoryData[catId];
@@ -392,13 +423,13 @@
           name: mainName,
           price: mainPrice,
           catId: catId,
-          img: getSmartIcon(mainName, cat.img)
+          img: getSmartIcon(mainName, cat.name, mainIndex)
         });
         mainIndex++;
       }
     }
 
-    // 2. 生成 800 款「名稱與價格絕對不重複」的配件 (結合動態圖示)
+    // 2. 生成 800 款配件 (確保小圖片精準貼合且多元不重複)
     let globalIndex = 1;
     for (let catId = 0; catId < categoryData.length; catId++) {
       const cat = categoryData[catId];
@@ -427,7 +458,7 @@
           name: nameCandidate,
           price: priceCandidate,
           catId: catId,
-          img: getSmartIcon(nameCandidate, cat.img)
+          img: getSmartIcon(nameCandidate, cat.name, globalIndex)
         });
 
         globalIndex++;
@@ -505,7 +536,6 @@
       const selectedMainId = document.getElementById("primaryProductSelect").value;
       const mainProduct = mainProducts.find(p => p.id === selectedMainId);
 
-      // 渲染主商品卡片
       const mainCard = document.getElementById("mainProductCard");
       mainCard.innerHTML = `
         <div class="flex items-center gap-4">
