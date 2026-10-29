@@ -97,7 +97,7 @@
           <i data-lucide="dollar-sign" class="w-4 h-4 text-indigo-600"></i> 2. 設定配件單品預算上限
         </label>
         <div class="flex items-center gap-3">
-          <input type="range" id="budgetRange" min="500" max="30000" step="500" value="30000" oninput="updateBudgetDisplay(); debouncedCalculate();" class="w-full accent-indigo-600">
+          <input type="range" id="budgetRange" min="500" max="100000" step="500" value="100000" oninput="updateBudgetDisplay(); debouncedCalculate();" class="w-full accent-indigo-600">
           <span id="budgetValue" class="font-bold text-indigo-600 min-w-[90px] text-right">NT$ 30,000</span>
         </div>
         <p class="text-[11px] text-slate-400 mt-1">💡 註：此預算上限僅限制「配件」，主商品金額可獨立自由選擇。</p>
