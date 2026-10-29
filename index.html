@@ -65,7 +65,7 @@
           <i data-lucide="shopping-bag"></i> 跨領域智慧商品關聯推薦系統
         </h1>
         <p class="text-indigo-200 mt-1 text-sm">
-          應用離散數學：$100 \times 800$ 矩陣集合 + **唯一名稱與金額不重複演算法**
+          應用離散數學：$100 \times 800$ 矩陣集合 + **全域零重複防撞演算法**
         </p>
       </div>
       <!-- 右上角購物車圖案與品項按鈕 -->
@@ -110,7 +110,7 @@
           </span>
           <input type="checkbox" id="showAllToggle" onchange="calculateRecommendations()" class="w-4 h-4 accent-indigo-600 rounded">
         </label>
-        <p class="text-xs text-slate-400 mt-1">勾選後將載入全部 800 款獨立不重複配件</p>
+        <p class="text-xs text-slate-400 mt-1">勾選後將載入全部 800 款絕對獨立不重複配件</p>
       </div>
 
       <!-- 離散數學理論說明小卡 -->
@@ -118,8 +118,8 @@
         <div class="font-bold text-sm text-indigo-700 border-b border-indigo-200 pb-1 flex items-center gap-1">
           <i data-lucide="brain-circuit" class="w-4 h-4"></i> 唯一性集合生成 (Unique Set)
         </div>
-        <p><strong>• 唯一名稱矩陣:</strong> 運用笛卡兒積概念組合 10 大領域，確保 800 款商品名稱 100% 互異。</p>
-        <p><strong>• 唯一金額映射:</strong> 透過質數擾動與不重複雜湊對應，確保每項商品價格獨立無重複。</p>
+        <p><strong>• 全域防撞驗證:</strong> 採用 Set 集合驗證，確保 800 款配件名稱與金額 100% 互異。</p>
+        <p><strong>• 高效能虛擬視窗:</strong> 結合 $O(1)$ 雜湊快取與動態渲染，確保極致 60 FPS。</p>
       </div>
 
     </section>
@@ -209,72 +209,72 @@
     const categoryData = [
       {
         name: "3C數碼", img: "💻",
-        brands: ["ROG 玩家共和國", "Logitech G", "Razer 雷蛇", "Corsair 海盜船", "MSI 微星", "Apple 蘋果", "Samsung 三星", "Sony 索尼", "Dell 戴爾", "ASUS 華碩"],
-        specs: ["27吋 4K", "RGB 機械式", "三模無線", "主動降噪", "10合1", "磁吸金屬", "高速行動", "25000mAh", "智慧自動調光", "多平台藍牙"],
-        cores: ["電競螢幕", "青軸鍵盤", "電競滑鼠", "藍牙耳機", "Type-C集線器", "筆電支架", "外接固態硬碟", "雙向快充行動電源", "螢幕掛燈", "無線遊戲手把", "環繞藍牙喇叭", "專業繪圖板", "Wi-Fi 7路由器", "水冷散熱器", "高速記憶卡", "4K視訊鏡頭", "編織轉接線", "軍規防摔殼", "抗藍光保護貼", "指向性麥克風"]
+        brands: ["ROG", "Logitech", "Razer", "Corsair", "MSI", "Apple", "Samsung", "Sony", "Dell", "ASUS", "HyperX", "JBL", "Anker", "Belkin", "CalDigit"],
+        specs: ["27吋 4K", "RGB 機械", "三模無線", "主動降噪", "10合1", "磁吸金屬", "高速行動", "25000mAh", "智慧自動", "多平台藍牙", "極速電競", "超薄便攜", "專業創作者", "軍規防摔", "旗艦特仕"],
+        cores: ["電競螢幕", "青軸鍵盤", "電競滑鼠", "藍牙耳機", "Type-C集線器", "筆電支架", "外接固態硬碟", "雙向快充行動電源", "螢幕掛燈", "無線遊戲手把", "環繞藍牙喇叭", "專業繪圖板", "Wi-Fi 7路由器", "水冷散熱器", "高速記憶卡", "4K視訊鏡頭", "編織轉接線", "防摔保護殼", "抗藍光貼", "指向性麥克風"]
       },
       {
         name: "生活家電", img: "☕",
-        brands: ["Dyson 戴森", "BALMUDA 巴慕達", "IRIS 歐愛麗", "BRUNO 美型", "DeLonghi 迪朗奇", "Panasonic 國際牌", "HITACHI 日立", "PHILIPS 飛利浦", "SHARP 夏普", "TOSHIBA 東芝"],
-        specs: ["智慧自動感應", "日系美型", "無線手持強力", "循環扇極靜音", "負離子高速", "智能恆溫", "多功能全自動", "UV紫外線智慧", "桌上型迷你", "超音波香氛"],
+        brands: ["Dyson", "BALMUDA", "IRIS", "BRUNO", "DeLonghi", "Panasonic", "HITACHI", "PHILIPS", "SHARP", "TOSHIBA", "Zojirushi", "Tiger", "Braun", "Ecovacs", "Roborock"],
+        specs: ["智慧自動", "日系美型", "無線手持", "循環極靜音", "負離子高速", "智能恆溫", "多功能全自動", "UV紫外線", "桌上型迷你", "超音波香氛", "雙重過濾", "節能省電", "極速加熱", "殺菌烘乾", "負離子淨化"],
         cores: ["義式咖啡機", "蒸氣烤箱", "無線吸塵器", "立式電風扇", "美髮吹風機", "恆溫電熱水壺", "製冰機", "烘鞋除菌機", "空氣清淨機", "加濕香氛機", "除濕乾燥機", "微波料理爐", "全營養果汁機", "音波電動牙刷", "智慧掃地機", "料理電子秤", "光觸媒捕蚊燈", "陶瓷電暖器", "手持掛燙機", "櫥下淨水器"]
       },
       {
         name: "戶外露營", img: "⛺",
-        brands: ["Snow Peak", "Coleman", "Colman 柯曼", "Thule 都樂", "Black Diamond", "Nordisk 北歐", "Logos 樂高士", "Naturehike 挪客", "KZM 戶外", "Coleman 經典"],
-        specs: ["輕量化鈦合金", "荷蘭鑄鐵", "高亮度 LED", "一房一廳速開", "鋁合金摺疊", "高密度發泡", "便攜式戶外", "大容量保溫", "防水防潮", "多功能工兵"],
+        brands: ["Snow Peak", "Coleman", "Thule", "Black Diamond", "Nordisk", "Logos", "Naturehike", "KZM", "Helinox", "MSR", "Petzl", "GSI", "Osprey", "Patagonia", "Columbia"],
+        specs: ["輕量化鈦金", "荷蘭鑄鐵", "高亮度 LED", "一房一廳", "鋁合金摺疊", "高密度發泡", "便攜戶外", "大容量保溫", "防水防潮", "多功能工兵", "極地防寒", "防風抗UV", "快乾透氣", "超輕量", "重裝防護"],
         cores: ["雙層登山杯", "鍋具組", "露營氛圍燈", "露營帳篷", "蛋捲桌", "隔音睡墊", "瓦斯爐", "冰桶保溫箱", "防潮野餐墊", "摺疊圓鍬", "羽絨睡袋", "天幕遮陽帳", "碳纖維登山杖", "鋁合金折疊椅", "焚火架", "強光頭燈", "多功能求生刀", "戶外濾水器", "急救醫療包", "強力掛繩組"]
       },
       {
         name: "汽機車百貨", img: "🚗",
-        brands: ["Garmin 佳明", "Mio 宇達電通", "70mai 七十邁", "PHILIPS 汽車照明", "BASEUS 倍思", "3M 車用防護", "SONAX 德國", "SHARK 鯊魚", "JBL 車載", "BLACK+DECKER"],
-        specs: ["高清夜視前後", "磁吸式車用無線", "車用多功能", "奈米防潑水", "重低音車載", "多功能胎壓", "車用緊急救援", "記憶棉人體工學", "超強力車用", "LED 矩陣式"],
+        brands: ["Garmin", "Mio", "70mai", "BASEUS", "3M", "SONAX", "SHARK", "BLACK+DECKER", "Bridgestone", "Michelin", "Bosch", "Hella", "Pioneer", "Alpine", "Meguiar's"],
+        specs: ["高清夜視", "磁吸無線", "車用多功能", "奈米防潑水", "重低音車載", "胎壓偵測", "車用救援", "人體工學腰靠", "超強吸力", "LED矩陣", "極速快充", "環景顯影", "抗UV隔熱", "防撞緩衝", "全天候防護"],
         cores: ["行車記錄器", "手機導航架", "負離子空氣清淨機", "車身鍍膜組", "藍牙喇叭音響", "胎壓偵測器", "行動電源啟動器", "車用腰靠墊", "手持吸塵器", "車室氣氛燈", "真皮方向盤套", "椅背收納袋", "磁吸遮陽簾", "車用安全錘", "智慧點菸器", "天然香氛罐", "全包覆椅套", "應急三角錐", "超細纖維洗車巾", "數位胎壓計"]
       },
       {
         name: "音樂樂器", img: "🎸",
-        brands: ["Yamaha 山葉", "Fender 芬達", "Gibson 吉布森", "Roland 羅蘭", "Korg 科音", "Boss 效果器", "Shure 舒爾", "Sennheiser 森海", "Martin 馬丁", "Ibanez 依班斯"],
-        specs: ["桃花心木", "專業導線", "多功能數位", "吉他專用", "錄音室專業", "耳罩式監聽", "實木調音", "防潮數位電子", "金屬琴弦保養", "可攜式琴譜"],
+        brands: ["Yamaha", "Fender", "Gibson", "Roland", "Korg", "Boss", "Shure", "Sennheiser", "Martin", "Ibanez", "Epiphone", "Taylor", "Zildjian", "Pearl", "Audio-Technica"],
+        specs: ["桃花心木", "專業導線", "多功能數位", "吉他專用", "錄音室專業", "耳罩監聽", "實木調音", "防潮電子", "金屬保養", "可攜式譜架", "手工特製", "舞台專用", "錄音級", "低延遲", "發燒友級"],
         cores: ["移調夾", "樂器導線", "節拍器", "壁掛架", "防噴罩", "監聽耳機", "調音器", "琴箱保護套", "潤滑保養組", "折疊琴譜架", "真皮吉他背帶", "綜合效果器", "琴頭收納包", "琴頸支架", "木吉他撥片盒", "爵士鼓地毯", "導線魔鬼氈", "節奏訓練機", "升降鋼琴椅", "樂器吹嘴刷"]
       },
       {
         name: "運動健身", img: "🏋️",
-        brands: ["Nike 耐吉", "Under Armour", "Adidas 愛迪達", "Decathlon 迪卡儂", "TriggerPoint", "Theragun", "Bowflex", "Manduka 曼朱卡", "Reebok", "PUMA"],
-        specs: ["專業高密度", "可調式重力", "防滑透氣舉重", "高彈力乳膠", "智慧計數", "大容量運動", "筋膜放鬆深層", "多功能懸吊", "核心肌群訓練", "運動防護機能"],
+        brands: ["Nike", "Under Armour", "Adidas", "Decathlon", "TriggerPoint", "Theragun", "Bowflex", "Manduka", "Reebok", "PUMA", "Garmin", "Fitbit", "Speedo", "Arena", "Wilson"],
+        specs: ["專業高密度", "可調重力", "防滑舉重", "高彈力乳膠", "智慧計數", "大容量運動", "筋膜深層", "多功能懸吊", "核心訓練", "運動防護", "極速燃脂", "吸濕排汗", "人體工學", "無重力", "強力支撐"],
         cores: ["瑜珈墊", "啞鈴組合", "舉重訓練手套", "阻力訓練帶", "跳繩", "太空瓶", "按摩槍", "懸吊訓練帶", "健腹輪", "護膝套", "韻律抗力球", "門上引體向上桿", "多功能壺鈴", "運動吸汗毛巾", "核心滑盤", "拳擊手靶", "深層筋膜球", "專業握力器", "彈力拉力繩", "瘦身呼啦圈"]
       },
       {
         name: "廚房衛浴", img: "🍳",
-        brands: ["Zwilling 雙人牌", "T-fal 特福", "Le Creuset", "WMF 德國", "OXO 好好用", "Panasonic 衛浴", "KOHLER 科勒", "TOTO 衛浴", "HCG 和成", "Sanitary"],
-        specs: ["日本職人手工", "不沾陶瓷", "食品級矽膠耐熱", "多功能料理", "不鏽鋼雙層", "自動感應給皂", "強力吸盤", "北歐風陶瓷", "防滑吸水", "多段式節水"],
+        brands: ["Zwilling", "T-fal", "Le Creuset", "WMF", "OXO", "KOHLER", "TOTO", "HCG", "Lock&Lock", "Thermos", "Tiger", "Britta", "Cuisinart", "KitchenAid", "Emile Henry"],
+        specs: ["職人手工", "不沾陶瓷", "食品級矽膠", "多功能料理", "不鏽鋼雙層", "自動感應", "強力吸盤", "北歐風陶瓷", "防滑吸水", "節水省水", "抗菌防霉", "真空保溫", "高效過濾", "耐熱防爆", "極簡美學"],
         cores: ["菜刀組", "平底鍋", "耐熱鍋鏟", "料理電子秤", "保鮮盒組", "給皂機", "吹風機架", "衛浴五件套", "吸水地墊", "蓮蓬頭", "調味收納罐", "水槽瀝水籃", "天然木砧板", "多功能刨絲器", "真空保溫瓶", "磁吸牙刷架", "無死角馬桶刷", "毛巾置物桿", "水槽濾網", "智慧烘碗架"]
       },
       {
         name: "攝影影音", img: "📷",
-        brands: ["Manfrotto 曼富圖", "Gitzo 捷信", "Benro 百諾", "Peak Design", "Lowepro 樂攝寶", "Rode 羅德", "DJI 大疆", "Godox 神牛", "Sandisk 閃迪", "PolarPro"],
-        specs: ["碳纖維輕量化", "專業相機防潮", "V90 高速", "環形直播補光", "相機減光濾鏡", "無線領夾式", "多功能攝影師", "相機快拆", "手持穩定器三軸", "鏡頭專用清潔"],
+        brands: ["Manfrotto", "Gitzo", "Benro", "Peak Design", "Lowepro", "Rode", "DJI", "Godox", "Sandisk", "PolarPro", "SmallRig", "Zhiyun", "Atomos", "Nisi", "Kenko"],
+        specs: ["碳纖維輕量", "專業防潮", "V90高速", "環形補光", "減光濾鏡", "無線領夾", "攝影師專用", "快速拆裝", "三軸穩定", "鏡頭清潔", "電影級", "大光圈", "超廣角", "防手震", "旗艦級"],
         cores: ["三腳架", "電子防潮箱", "記憶卡", "補光燈", "鏡片組", "麥克風", "後背包", "背帶組", "雲台", "清潔組", "反光板組", "攝影棚燈", "電子快門線", "相機內膽包", "柔光罩", "微距鏡片", "熱靴水平儀", "鋰電池", "雙槽充電器", "減壓背帶"]
       },
       {
         name: "辦公文具", img: "✏️",
-        brands: ["3M 辦公", "Kokuyo 國譽", "Pentel 派通", "Muji 無印", "Brother 兄弟", "Dahle 德勒", "Niceday", "Faber-Castell", "Pilot 百樂", "Staedtler"],
-        specs: ["磁吸式桌面整線", "多功能金屬筆筒", "人體工學護腕", "LED 護眼觸控", "無線簡報器雷射", "多國語言萬用", "精美皮革", "多功能精密螺絲起", "強力磁鐵辦公", "檔案分類收納"],
+        brands: ["3M", "Kokuyo", "Pentel", "Muji", "Brother", "Dahle", "Faber-Castell", "Pilot", "Staedtler", "Zebra", "Parker", "Waterman", "Moleskine", "Leuchtturm1917", "Rhodia"],
+        specs: ["磁吸桌面整線", "多功能筆筒", "人體工學護腕", "LED護眼", "無線簡報", "萬用轉接", "精美皮革", "精密螺絲起", "強力磁鐵", "檔案收納", "高效省力", "極簡風", "商務專用", "防偽防盜", "環保再生"],
         cores: ["理線器", "收納盒", "滑鼠墊", "檯燈", "簡報筆", "轉接頭", "桌墊", "螺絲起子組", "白板", "公事包", "省力訂書機", "不鏽鋼剪刀", "多功能美工刀", "膠帶切割台", "公文夾", "便利貼", "按壓簽字筆", "商用計算機", "自動碎紙機", "電動打孔機"]
       },
       {
         name: "美妝保健", img: "💄",
-        brands: ["Panasonic 美容", "Refa 日本", "Foreo 瑞典", "Braun 德國", "Philips 美容", "Innisfree", "Shiseido 資生堂", "Lancome 蘭蔻", "Estee Lauder", "DHC"],
-        specs: ["LED 智能美妝", "大容量化妝品", "負離子直捲髮", "電動美甲修護", "超音波洗臉", "隨身香水噴霧", "旅行收納盥洗", "草本精油放鬆", "保濕噴霧奈米", "竹炭溫感"],
+        brands: ["Panasonic", "Refa", "Foreo", "Braun", "Philips", "Innisfree", "Shiseido", "Lancome", "Estee Lauder", "DHC", "Kose", "Clinique", "Clarins", "L'occitane", "Aesop"],
+        specs: ["LED智能", "大容量化妝", "負離子直捲", "電動美甲", "超音波洗臉", "隨身香水", "旅行收納", "草本精油", "保濕奈米", "竹炭溫感", "深層修護", "無瑕透亮", "植萃舒緩", "極效抗老", "微導循環"],
         cores: ["化妝鏡", "收納盒", "美髮梳", "修護器", "洗臉刷", "分裝瓶", "盥洗包", "滾珠瓶", "蒸臉機", "眼罩", "氣墊粉撲", "修眉刀組", "黑頭拔除儀", "光療美甲燈", "身體潤膚乳", "護手霜", "隨身維他命盒", "刮痧按摩板", "頭皮按摩梳", "造型髮夾組"]
       }
     ];
 
     const mainProducts = [];
     const accessories = [];
-    const usedNames = new Set();
-    const usedPrices = new Set();
+    const usedNamesSet = new Set();
+    const usedPricesSet = new Set();
 
-    // 生成 100 款主商品
+    // 1. 生成 100 款主商品
     for (let i = 1; i <= 100; i++) {
       const cat = categoryData[(i - 1) % categoryData.length];
       mainProducts.push({
@@ -286,40 +286,43 @@
       });
     }
 
-    // 生成 800 款配件（確保名稱與價格絕對唯一）
-    for (let j = 1; j <= 800; j++) {
-      const cat = categoryData[(j - 1) % categoryData.length];
-      
-      // 確保名稱絕對不重複的組合迴圈
-      let brand = cat.brands[(j * 7) % cat.brands.length];
-      let spec = cat.specs[(j * 13) % cat.specs.length];
-      let core = cat.cores[(j * 19) % cat.cores.length];
-      let candidateName = `${brand}｜${spec} ${core}`;
+    // 2. 嚴格防撞迴圈：確保 800 款配件「名稱與金額」絕對 100% 互異
+    let globalIndex = 1;
+    for (let catId = 0; catId < categoryData.length; catId++) {
+      const cat = categoryData[catId];
+      // 每個分類分配 80 款，10 個分類剛好 800 款
+      for (let k = 0; k < 80; k++) {
+        let nameCandidate = "";
+        let attempt = 0;
 
-      let collisionCount = 1;
-      while (usedNames.has(candidateName)) {
-        brand = cat.brands[(j * 7 + collisionCount) % cat.brands.length];
-        spec = cat.specs[(j * 13 + collisionCount) % cat.specs.length];
-        core = cat.cores[(j * 19 + collisionCount) % cat.cores.length];
-        candidateName = `${brand}｜${spec} ${core} (系列 ${collisionCount})`;
-        collisionCount++;
+        // 持續組合直到產出全域唯一的名稱
+        do {
+          const b = cat.brands[(k + attempt * 7) % cat.brands.length];
+          const s = cat.specs[(k + attempt * 13) % cat.specs.length];
+          const c = cat.cores[(k + attempt * 19) % cat.cores.length];
+          nameCandidate = `${b}｜${s} ${c}${attempt > 0 ? ` (${attempt + 1})` : ''}`;
+          attempt++;
+        } while (usedNamesSet.has(nameCandidate));
+
+        usedNamesSet.add(nameCandidate);
+
+        // 確保價格絕對唯一
+        let priceCandidate = 350 + (globalIndex * 41) + ((globalIndex * 109) % 28500);
+        while (usedPricesSet.has(priceCandidate)) {
+          priceCandidate += 13; // 質數擾動直到不重複
+        }
+        usedPricesSet.add(priceCandidate);
+
+        accessories.push({
+          id: `A${String(globalIndex).padStart(4, '0')}`,
+          name: nameCandidate,
+          price: priceCandidate,
+          catId: catId,
+          img: cat.img
+        });
+
+        globalIndex++;
       }
-      usedNames.add(candidateName);
-
-      // 確保金額絕對不重複的質數擾動演算法
-      let candidatePrice = 300 + (j * 43) + ((j * 97) % 28500);
-      while (usedPrices.has(candidatePrice)) {
-        candidatePrice += 11; // 加上質數直到金額唯一
-      }
-      usedPrices.add(candidatePrice);
-
-      accessories.push({
-        id: `A${String(j).padStart(4, '0')}`,
-        name: candidateName,
-        price: candidatePrice,
-        catId: (j - 1) % categoryData.length,
-        img: cat.img
-      });
     }
 
     // O(1) 雜湊快取矩陣表
