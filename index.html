@@ -21,7 +21,7 @@
       <p id="alertModalMessage" class="text-xs text-slate-600 mb-5 leading-relaxed">
         該商品金額已超過設定的預算上限。
       </p>
-      <button onclick="closeBudgetModal()" class="w-full py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition shadow-md">
+      <button onclick="closeBudgetModal()" class="w-full py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition shadow-md cursor-pointer">
         我知道了
       </button>
     </div>
@@ -29,12 +29,12 @@
 
   <!-- 💳 結帳視窗 (Checkout Modal) -->
   <div id="checkoutModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden border border-slate-100 transform scale-95 transition-transform duration-300 id-modal-card">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden border border-slate-100 transform scale-95 transition-transform duration-350 checkout-modal-card">
       <div class="bg-indigo-600 text-white p-5 flex justify-between items-center">
         <h3 class="text-lg font-bold flex items-center gap-2">
           <i data-lucide="credit-card"></i> 訂單結算與明細核對
         </h3>
-        <button onclick="closeCheckoutModal()" class="text-indigo-200 hover:text-white text-xl font-bold">✕</button>
+        <button onclick="closeCheckoutModal()" class="text-indigo-200 hover:text-white text-xl font-bold cursor-pointer">✕</button>
       </div>
       
       <div class="p-6 space-y-3 max-h-[60vh] overflow-y-auto" id="checkoutItemsContainer">
@@ -50,7 +50,7 @@
           <span class="font-bold text-slate-800">應付總金額：</span>
           <span id="modalTotalPrice" class="text-2xl font-extrabold text-indigo-600">NT$ 0</span>
         </div>
-        <button onclick="confirmOrder()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-md transition flex items-center justify-center gap-2">
+        <button onclick="confirmOrder()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-md transition flex items-center justify-center gap-2 cursor-pointer">
           <i data-lucide="check-circle-2"></i> 確認下單結帳
         </button>
       </div>
@@ -415,15 +415,15 @@
       totalPriceEl.innerText = `NT$ ${totalSum.toLocaleString()}`;
 
       modal.classList.remove("opacity-0", "pointer-events-none");
-      modal.querySelector(".id-modal-card").classList.remove("scale-95");
-      modal.querySelector(".id-modal-card").classList.add("scale-100");
+      modal.querySelector(".checkout-modal-card").classList.remove("scale-95");
+      modal.querySelector(".checkout-modal-card").classList.add("scale-100");
     }
 
     function closeCheckoutModal() {
       const modal = document.getElementById("checkoutModal");
       modal.classList.add("opacity-0", "pointer-events-none");
-      modal.querySelector(".id-modal-card").classList.remove("scale-100");
-      modal.querySelector(".id-modal-card").classList.add("scale-95");
+      modal.querySelector(".checkout-modal-card").classList.remove("scale-100");
+      modal.querySelector(".checkout-modal-card").classList.add("scale-95");
     }
 
     function confirmOrder() {
@@ -511,12 +511,12 @@
         const isOverBudget = !item.fitsBudget;
         let btnText = item.isInCart ? "已加入購物車 ✓" : "+ 加入購物車";
         let btnClass = item.isInCart 
-          ? "bg-emerald-600 hover:bg-emerald-700 text-white" 
-          : "bg-indigo-600 hover:bg-indigo-700 text-white";
+          ? "bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer" 
+          : "bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer";
 
         if (isOverBudget) {
-          btnText = "超過預算上限 ✕";
-          btnClass = "bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300";
+          btnText = "超過預算 ✕ (點擊檢視)";
+          btnClass = "bg-rose-100 text-rose-700 hover:bg-rose-200 border border-rose-300 font-bold cursor-pointer";
         }
 
         const boostTag = item.accBoost > 0 
@@ -524,7 +524,7 @@
           : '';
 
         recContainer.innerHTML += `
-          <div class="border ${isOverBudget ? 'border-rose-200 bg-rose-50/40 opacity-75' : item.accBoost > 0 ? 'border-amber-300 bg-amber-50/30' : 'border-slate-200 bg-white'} rounded-lg p-3 hover:border-indigo-300 transition shadow-sm flex flex-col justify-between gap-2">
+          <div class="border ${isOverBudget ? 'border-rose-200 bg-rose-50/40' : item.accBoost > 0 ? 'border-amber-300 bg-amber-50/30' : 'border-slate-200 bg-white'} rounded-lg p-3 hover:border-indigo-300 transition shadow-sm flex flex-col justify-between gap-2">
             <div class="flex items-start justify-between">
               <div class="flex items-center gap-2">
                 <span class="text-xl">${item.img}</span>
