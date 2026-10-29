@@ -20,22 +20,52 @@
     </div>
   </div>
 
+  <!-- 💳 結帳視窗 (Checkout Modal) -->
+  <div id="checkoutModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden border border-slate-100 transform scale-95 transition-transform duration-300 id-modal-card">
+      <div class="bg-indigo-600 text-white p-5 flex justify-between items-center">
+        <h3 class="text-lg font-bold flex items-center gap-2">
+          <i data-lucide="credit-card"></i> 訂單結算與明細核對
+        </h3>
+        <button onclick="closeCheckoutModal()" class="text-indigo-200 hover:text-white text-xl font-bold">✕</button>
+      </div>
+      
+      <div class="p-6 space-y-4 max-h-[60vh] overflow-y-auto" id="checkoutItemsContainer">
+        <!-- JS 動態生成結帳清單 -->
+      </div>
+
+      <div class="bg-slate-50 p-5 border-t border-slate-200 space-y-3">
+        <div class="flex justify-between text-sm text-slate-600">
+          <span>商品總筆數：</span>
+          <span id="modalTotalCount" class="font-bold">0 項</span>
+        </div>
+        <div class="flex justify-between items-center pt-2 border-t border-slate-200 text-lg">
+          <span class="font-bold text-slate-800">應付總金額：</span>
+          <span id="modalTotalPrice" class="text-2xl font-extrabold text-indigo-600">NT$ 0</span>
+        </div>
+        <button onclick="confirmOrder()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-md transition flex items-center justify-center gap-2">
+          <i data-lucide="check-circle-2"></i> 確認下單結帳
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Header -->
   <header class="bg-indigo-600 text-white py-6 shadow-md">
     <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
       <div>
         <h1 class="text-3xl font-bold flex items-center gap-2">
-          <i data-lucide="shopping-bag"></i> 跨領域智慧商品關聯推薦系統 (極致高效版)
+          <i data-lucide="shopping-bag"></i> 跨領域智慧商品關聯推薦系統
         </h1>
         <p class="text-indigo-200 mt-1 text-sm">
           應用離散數學：$100 \times 1000$ 矩陣 + **Hash Map ($O(1)$)** + **Debounce** + **Virtual Windowing**
         </p>
       </div>
-      <!-- 購物車按鈕指示 -->
-      <div class="bg-indigo-700 px-4 py-2 rounded-lg border border-indigo-500 flex items-center gap-2">
+      <!-- 購物車按鈕：點擊可直接觸發結帳 Modal -->
+      <button onclick="openCheckoutModal()" class="bg-indigo-700 hover:bg-indigo-800 px-4 py-2.5 rounded-xl border border-indigo-500 flex items-center gap-2 shadow-sm transition active:scale-95">
         <i data-lucide="shopping-cart"></i>
-        <span>購物車品項: <strong id="cartCount">0</strong> 項</span>
-      </div>
+        <span>購物車品項: <strong id="cartCount" class="text-amber-300">0</strong> 項 (點擊結帳)</span>
+      </button>
     </div>
   </header>
 
@@ -54,7 +84,7 @@
         </select>
       </div>
 
-      <!-- 步驟 2: 設定預算限制 (結合 Debounce 防抖) -->
+      <!-- 步驟 2: 設定預算限制 -->
       <div>
         <label class="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
           <i data-lucide="dollar-sign" class="w-4 h-4 text-indigo-600"></i> 2. 設定配件單品預算上限
@@ -120,9 +150,14 @@
 
       <!-- 🛒 購物車結算專區 -->
       <div class="bg-indigo-900 text-white p-6 rounded-xl shadow-md space-y-4">
-        <h2 class="text-lg font-bold flex items-center gap-2 border-b border-indigo-800 pb-3">
-          <i data-lucide="shopping-cart"></i> 我的購物車清單與總金額計算
-        </h2>
+        <div class="flex justify-between items-center border-b border-indigo-800 pb-3">
+          <h2 class="text-lg font-bold flex items-center gap-2">
+            <i data-lucide="shopping-cart"></i> 我的購物車清單與總金額計算
+          </h2>
+          <button onclick="openCheckoutModal()" class="px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold rounded-lg text-xs transition flex items-center gap-1 shadow">
+            <i data-lucide="arrow-right-circle"></i> 前往結帳
+          </button>
+        </div>
         
         <div id="cartItemsList" class="space-y-2 max-h-48 overflow-y-auto pr-2">
           <!-- JS 動態渲染購物車項目 -->
@@ -204,7 +239,7 @@
       });
     }
 
-    // 方法一：O(1) 雜湊快取矩陣表初始化 (Hash Map Cache)
+    // O(1) 雜湊快取矩陣表初始化 (Hash Map Cache)
     const weightCache = {};
     function initHashCache() {
       mainProducts.forEach(main => {
@@ -227,7 +262,7 @@
     let isBatchLoading = false;
     let debounceTimer = null;
 
-    // 方法二：防抖機制 (Debounce) 避免滑桿滑動時計算過載
+    // 防抖機制 (Debounce)
     function debouncedCalculate() {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
@@ -236,7 +271,7 @@
     }
 
     window.onload = function() {
-      initHashCache(); // 初始化 O(1) 雜湊表
+      initHashCache();
 
       const select = document.getElementById("primaryProductSelect");
       mainProducts.forEach(p => {
@@ -287,7 +322,7 @@
         cart.splice(existingIndex, 1);
       } else {
         if (product.price > budget) {
-          showToast(`「${product.name}」單價為 NT$ ${product.price.toLocaleString()}，已超過設定的預算上限！`);
+          showToast(`「${product.name}」單價為 NT$ ${product.price.toLocaleString()}，已超過設定的預算上限 (NT$ ${budget.toLocaleString()})！`);
           return;
         }
         cart.push({ ...product, category: "Accessory" });
@@ -334,7 +369,64 @@
     }
 
     // -------------------------------------------------------------
-    // 3. 核心運算與方法三：可視區動態載入 (Virtual Windowing)
+    // 2. 💳 結帳視窗 (Modal) 邏輯
+    // -------------------------------------------------------------
+    function openCheckoutModal() {
+      const modal = document.getElementById("checkoutModal");
+      const container = document.getElementById("checkoutItemsContainer");
+      const totalCountEl = document.getElementById("modalTotalCount");
+      const totalPriceEl = document.getElementById("modalTotalPrice");
+
+      container.innerHTML = "";
+      let totalSum = 0;
+
+      cart.forEach(item => {
+        totalSum += item.price;
+        const isMain = item.category === "Main";
+        container.innerHTML += `
+          <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">${item.img}</span>
+              <div>
+                <h4 class="font-bold text-slate-800 text-sm">${item.name}</h4>
+                <span class="text-xs text-slate-500">${isMain ? '主要商品' : '智慧配件'}</span>
+              </div>
+            </div>
+            <span class="font-bold text-indigo-600">NT$ ${item.price.toLocaleString()}</span>
+          </div>
+        `;
+      });
+
+      if (cart.length === 0) {
+        container.innerHTML = `<p class="text-center py-8 text-slate-400">購物車內無任何商品。</p>`;
+      }
+
+      totalCountEl.innerText = `${cart.length} 項`;
+      totalPriceEl.innerText = `NT$ ${totalSum.toLocaleString()}`;
+
+      modal.classList.remove("opacity-0", "pointer-events-none");
+      modal.querySelector(".id-modal-card").classList.remove("scale-95");
+      modal.querySelector(".id-modal-card").classList.add("scale-100");
+    }
+
+    function closeCheckoutModal() {
+      const modal = document.getElementById("checkoutModal");
+      modal.classList.add("opacity-0", "pointer-events-none");
+      modal.querySelector(".id-modal-card").classList.remove("scale-100");
+      modal.querySelector(".id-modal-card").classList.add("scale-95");
+    }
+
+    function confirmOrder() {
+      if (cart.length === 0) {
+        alert("購物車是空的，無法結帳！");
+        return;
+      }
+      alert("🎉 感謝您的購買！訂單已成功建立。");
+      closeCheckoutModal();
+    }
+
+    // -------------------------------------------------------------
+    // 3. 核心運算與可視區動態載入 (Virtual Windowing)
     // -------------------------------------------------------------
     function calculateRecommendations() {
       const selectedMainId = document.getElementById("primaryProductSelect").value;
@@ -343,9 +435,8 @@
       
       const mainProduct = mainProducts.find(p => p.id === selectedMainId);
       const cartAccessories = cart.filter(item => item.category === "Accessory");
-      const mainWeights = weightCache[selectedMainId]; // O(1) 雜湊表快速取值
+      const mainWeights = weightCache[selectedMainId];
 
-      // 運算 1,000 款配件分數
       const processedList = accessories.map(acc => {
         const baseWeight = mainWeights[acc.id] || 1;
         let accBoost = 0;
@@ -364,7 +455,7 @@
       processedList.sort((a, b) => b.totalWeight - a.totalWeight);
 
       filteredListCache = showAll ? processedList : processedList.filter(item => item.isRecommended);
-      renderCount = 20; // 重置視窗顯示筆數
+      renderCount = 20;
 
       document.getElementById("recCountBadge").innerText = `已顯示 ${Math.min(renderCount, filteredListCache.length)} / 共 ${filteredListCache.length} 項`;
       document.getElementById("scrollWindowContainer").scrollTop = 0;
@@ -373,7 +464,6 @@
       renderMatrixTable(processedList);
     }
 
-    // 監聽滾動事件，實作動態載入視窗 (Virtual Windowing)
     function handleWindowScroll() {
       const container = document.getElementById("scrollWindowContainer");
       
@@ -383,7 +473,7 @@
           document.getElementById("loadingIndicator").classList.remove("hidden");
 
           setTimeout(() => {
-            renderCount += 20; // 滾動到底部時追加 20 筆
+            renderCount += 20;
             renderWindowItems();
             document.getElementById("recCountBadge").innerText = `已顯示 ${Math.min(renderCount, filteredListCache.length)} / 共 ${filteredListCache.length} 項`;
             document.getElementById("loadingIndicator").classList.add("hidden");
@@ -393,7 +483,6 @@
       }
     }
 
-    // 渲染可視視窗內的項目
     function renderWindowItems() {
       const recContainer = document.getElementById("recommendationList");
       const currentItems = filteredListCache.slice(0, renderCount);
@@ -417,7 +506,7 @@
 
         if (isOverBudget) {
           btnText = "超過預算上限 ✕";
-          btnClass = "bg-slate-300 text-slate-500 cursor-not-allowed";
+          btnClass = "bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300";
         }
 
         const boostTag = item.accBoost > 0 
@@ -425,7 +514,7 @@
           : '';
 
         recContainer.innerHTML += `
-          <div class="border ${isOverBudget ? 'border-slate-200 bg-slate-50 opacity-60' : item.accBoost > 0 ? 'border-amber-300 bg-amber-50/30' : 'border-slate-200 bg-white'} rounded-lg p-3 hover:border-indigo-300 transition shadow-sm flex flex-col justify-between gap-2">
+          <div class="border ${isOverBudget ? 'border-rose-200 bg-rose-50/40 opacity-75' : item.accBoost > 0 ? 'border-amber-300 bg-amber-50/30' : 'border-slate-200 bg-white'} rounded-lg p-3 hover:border-indigo-300 transition shadow-sm flex flex-col justify-between gap-2">
             <div class="flex items-start justify-between">
               <div class="flex items-center gap-2">
                 <span class="text-xl">${item.img}</span>
@@ -433,8 +522,8 @@
                   <h4 class="font-bold text-slate-800 text-xs flex items-center gap-1">
                     ${item.name} ${boostTag}
                   </h4>
-                  <p class="${isOverBudget ? 'text-rose-500' : 'text-indigo-600'} font-bold text-xs">
-                    NT$ ${item.price.toLocaleString()} ${isOverBudget ? '(超預算)' : ''}
+                  <p class="${isOverBudget ? 'text-rose-600 font-extrabold' : 'text-indigo-600 font-bold'} text-xs">
+                    NT$ ${item.price.toLocaleString()} ${isOverBudget ? '(超過預算)' : ''}
                   </p>
                 </div>
               </div>
@@ -452,7 +541,6 @@
       lucide.createIcons();
     }
 
-    // 渲染矩陣表 (預覽前 50 筆高效能顯示)
     function renderMatrixTable(processedList) {
       const tableBody = document.getElementById("matrixTableBody");
       tableBody.innerHTML = "";
@@ -461,7 +549,7 @@
       previewItems.forEach(item => {
         const budgetStatus = item.fitsBudget 
           ? `<span class="text-emerald-600 font-semibold">✓ 符合</span>` 
-          : `<span class="text-rose-500 font-semibold">✕ 超預算</span>`;
+          : `<span class="text-rose-600 font-bold bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200">✕ 超過預算</span>`;
 
         tableBody.innerHTML += `
           <tr class="border-b hover:bg-slate-50">
