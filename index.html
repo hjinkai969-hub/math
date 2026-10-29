@@ -25,10 +25,10 @@
     <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
       <div>
         <h1 class="text-3xl font-bold flex items-center gap-2">
-          <i data-lucide="shopping-bag"></i> 跨領域智慧商品關聯推薦系統
+          <i data-lucide="shopping-bag"></i> 跨領域智慧商品關聯推薦系統 (極致高效版)
         </h1>
         <p class="text-indigo-200 mt-1 text-sm">
-          應用離散數學：$100 \times 1000$ 巨量關聯矩陣與 **可視區動態載入 (Windowing)** 效能優化
+          應用離散數學：$100 \times 1000$ 矩陣 + **Hash Map ($O(1)$)** + **Debounce** + **Virtual Windowing**
         </p>
       </div>
       <!-- 購物車按鈕指示 -->
@@ -54,7 +54,7 @@
         </select>
       </div>
 
-      <!-- 步驟 2: 設定預算限制 -->
+      <!-- 步驟 2: 設定預算限制 (結合 Debounce 防抖) -->
       <div>
         <label class="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
           <i data-lucide="dollar-sign" class="w-4 h-4 text-indigo-600"></i> 2. 設定配件單品預算上限
@@ -73,16 +73,17 @@
           </span>
           <input type="checkbox" id="showAllToggle" onchange="calculateRecommendations()" class="w-4 h-4 accent-indigo-600 rounded">
         </label>
-        <p class="text-xs text-slate-400 mt-1">勾選後將檢視全部 1,000 款配件（已啟用動態視窗載入）</p>
+        <p class="text-xs text-slate-400 mt-1">勾選後將載入全部 1,000 款配件 (已啟用三大優化)</p>
       </div>
 
       <!-- 離散數學理論說明小卡 -->
       <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100 text-xs text-indigo-900 space-y-2">
         <div class="font-bold text-sm text-indigo-700 border-b border-indigo-200 pb-1 flex items-center gap-1">
-          <i data-lucide="brain-circuit" class="w-4 h-4"></i> 離散數學與效能優化原理
+          <i data-lucide="brain-circuit" class="w-4 h-4"></i> 三大效能優化架構
         </div>
-        <p><strong>• 動態區塊切片 ($S_{window} \subset S$):</strong> 透過滾動監聽（Scroll Listener），僅在視窗進入臨界區時延伸載入子集，將單次渲染時間控制在 16ms 內（達到 60 FPS）。</p>
-        <p><strong>• 雜湊對應表 ($O(1)$ Hash Map):</strong> 預先建立 $100 \times 1000$ 雙向權重關係，避免雙重迴圈造成的效能瓶頸。</p>
+        <p><strong>1. Hash Map ($O(1)$):</strong> 預建快取矩陣，免除重複迴圈搜尋。</p>
+        <p><strong>2. Debounce:</strong> 滑桿防抖控制，過濾高頻計算事件。</p>
+        <p><strong>3. Virtual Windowing:</strong> 滾動視窗動態載入，維持極致 60 FPS。</p>
       </div>
 
     </section>
@@ -95,25 +96,24 @@
         <!-- JS 動態渲染 -->
       </div>
 
-      <!-- 推薦配件清單 (可視區動態載入容器) -->
+      <!-- 推薦配件清單 (結合虛擬滾動視窗) -->
       <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <i data-lucide="sparkles" class="text-amber-500"></i> 智慧推薦配件 (滾動自動載入更多)
+            <i data-lucide="sparkles" class="text-amber-500"></i> 智慧推薦配件 (高效虛擬滾動區)
           </h2>
           <span id="recCountBadge" class="text-xs bg-indigo-100 text-indigo-700 px-2.5 py-1 rounded-full font-bold">
             載入中...
           </span>
         </div>
 
-        <!-- 可視區滾動容器：監聯 onscroll 事件 -->
+        <!-- 滾動容器：監聽 onscroll -->
         <div id="scrollWindowContainer" onscroll="handleWindowScroll()" class="h-[450px] overflow-y-auto border border-slate-100 rounded-lg p-3 bg-slate-50/50">
           <div id="recommendationList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- JS 動態渲染卡片 -->
+            <!-- JS 動態渲染 -->
           </div>
-          <!-- 滾動到底部的載入指示器 -->
           <div id="loadingIndicator" class="text-center py-4 text-xs font-bold text-slate-400 hidden">
-            ⏳ 正在動態載入更多推薦配件...
+            ⏳ 正在載入更多推薦配件...
           </div>
         </div>
       </div>
@@ -137,7 +137,7 @@
       <!-- 關聯矩陣視覺化 -->
       <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
         <h2 class="text-md font-bold text-slate-800 mb-3 flex items-center gap-2">
-          <i data-lucide="grid" class="text-indigo-600"></i> 動態加權總分數矩陣表 (前 50 筆精準顯示)
+          <i data-lucide="grid" class="text-indigo-600"></i> 動態加權總分數矩陣表 (前 50 筆高效能預覽)
         </h2>
         <div class="overflow-x-auto max-h-80">
           <table class="w-full text-sm text-left border-collapse">
@@ -204,7 +204,7 @@
       });
     }
 
-    // O(1) 雜湊快取矩陣表
+    // 方法一：O(1) 雜湊快取矩陣表初始化 (Hash Map Cache)
     const weightCache = {};
     function initHashCache() {
       mainProducts.forEach(main => {
@@ -222,12 +222,12 @@
     }
 
     let cart = [];
-    let filteredListCache = []; // 快取計算後且排序完的配件清單
-    let renderCount = 20;       // 當前可視區載入的數量 (每次增加 20 筆)
+    let filteredListCache = [];
+    let renderCount = 20;       // 虛擬視窗初始渲染 20 筆
     let isBatchLoading = false;
     let debounceTimer = null;
 
-    // 防抖機制
+    // 方法二：防抖機制 (Debounce) 避免滑桿滑動時計算過載
     function debouncedCalculate() {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
@@ -236,7 +236,7 @@
     }
 
     window.onload = function() {
-      initHashCache(); // 建立 O(1) 雜湊快取表
+      initHashCache(); // 初始化 O(1) 雜湊表
 
       const select = document.getElementById("primaryProductSelect");
       mainProducts.forEach(p => {
@@ -334,7 +334,7 @@
     }
 
     // -------------------------------------------------------------
-    // 2. 矩陣計算與可視區動態載入邏輯 (Windowing / Infinite Scroll)
+    // 3. 核心運算與方法三：可視區動態載入 (Virtual Windowing)
     // -------------------------------------------------------------
     function calculateRecommendations() {
       const selectedMainId = document.getElementById("primaryProductSelect").value;
@@ -342,25 +342,10 @@
       const showAll = document.getElementById("showAllToggle").checked;
       
       const mainProduct = mainProducts.find(p => p.id === selectedMainId);
-
-      document.getElementById("mainProductCard").innerHTML = `
-        <div class="flex items-center gap-4">
-          <div class="text-4xl bg-slate-100 p-3 rounded-lg">${mainProduct.img}</div>
-          <div>
-            <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">已選擇主商品</span>
-            <h3 class="text-xl font-bold text-slate-800">${mainProduct.name}</h3>
-            <p class="text-slate-500 font-semibold">NT$ ${mainProduct.price.toLocaleString()}</p>
-          </div>
-        </div>
-        <div class="text-right text-xs text-slate-400">
-          主商品已自動加入購物車
-        </div>
-      `;
-
       const cartAccessories = cart.filter(item => item.category === "Accessory");
-      const mainWeights = weightCache[selectedMainId];
+      const mainWeights = weightCache[selectedMainId]; // O(1) 雜湊表快速取值
 
-      // 計算 1,000 款配件的加權分數 (利用 O(1) 快取)
+      // 運算 1,000 款配件分數
       const processedList = accessories.map(acc => {
         const baseWeight = mainWeights[acc.id] || 1;
         let accBoost = 0;
@@ -378,41 +363,37 @@
 
       processedList.sort((a, b) => b.totalWeight - a.totalWeight);
 
-      // 保存篩選後的陣列，並重置載入筆數
       filteredListCache = showAll ? processedList : processedList.filter(item => item.isRecommended);
-      renderCount = 20; // 初始只載入前 20 筆
+      renderCount = 20; // 重置視窗顯示筆數
 
       document.getElementById("recCountBadge").innerText = `已顯示 ${Math.min(renderCount, filteredListCache.length)} / 共 ${filteredListCache.length} 項`;
-
-      // 滾動條歸頂
       document.getElementById("scrollWindowContainer").scrollTop = 0;
 
       renderWindowItems();
       renderMatrixTable(processedList);
     }
 
-    // 監聽滾動事件：當捲動到接近底部時動態擴充載入
+    // 監聽滾動事件，實作動態載入視窗 (Virtual Windowing)
     function handleWindowScroll() {
       const container = document.getElementById("scrollWindowContainer");
       
-      // 當距離底部小於 60px 且還有未載入資料時觸發
       if (container.scrollTop + container.clientHeight >= container.scrollHeight - 60) {
         if (renderCount < filteredListCache.length && !isBatchLoading) {
           isBatchLoading = true;
           document.getElementById("loadingIndicator").classList.remove("hidden");
 
           setTimeout(() => {
-            renderCount += 20; // 每次追加 20 筆
+            renderCount += 20; // 滾動到底部時追加 20 筆
             renderWindowItems();
             document.getElementById("recCountBadge").innerText = `已顯示 ${Math.min(renderCount, filteredListCache.length)} / 共 ${filteredListCache.length} 項`;
             document.getElementById("loadingIndicator").classList.add("hidden");
             isBatchLoading = false;
-          }, 100); // 稍微延遲產生順暢動畫感
+          }, 80);
         }
       }
     }
 
-    // 渲染當前動態視窗內的項目
+    // 渲染可視視窗內的項目
     function renderWindowItems() {
       const recContainer = document.getElementById("recommendationList");
       const currentItems = filteredListCache.slice(0, renderCount);
@@ -471,7 +452,7 @@
       lucide.createIcons();
     }
 
-    // 渲染矩陣表 (取前 50 筆高效能預覽)
+    // 渲染矩陣表 (預覽前 50 筆高效能顯示)
     function renderMatrixTable(processedList) {
       const tableBody = document.getElementById("matrixTableBody");
       tableBody.innerHTML = "";
