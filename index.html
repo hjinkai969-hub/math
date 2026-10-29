@@ -68,7 +68,7 @@
           應用離散數學：$100 \times 1000$ 矩陣 + **Hash Map ($O(1)$)** + **Debounce** + **Virtual Windowing**
         </p>
       </div>
-      <!-- 右上角購物車圖案與品項按鈕 (點擊跳出結帳畫面) -->
+      <!-- 右上角購物車圖案與品項按鈕 -->
       <button onclick="openCheckoutModal()" class="bg-indigo-700 hover:bg-indigo-800 px-4 py-2.5 rounded-xl border border-indigo-500 flex items-center gap-2 shadow-sm transition active:scale-95 cursor-pointer">
         <i data-lucide="shopping-cart" class="w-5 h-5 text-amber-300"></i>
         <span class="text-sm">購物車品項: <strong id="cartCount" class="text-amber-300 font-bold">0</strong> 項</span>
@@ -110,7 +110,7 @@
           </span>
           <input type="checkbox" id="showAllToggle" onchange="calculateRecommendations()" class="w-4 h-4 accent-indigo-600 rounded">
         </label>
-        <p class="text-xs text-slate-400 mt-1">勾選後將載入全部 1,000 款配件 (已啟用三大優化)</p>
+        <p class="text-xs text-slate-400 mt-1">勾選後將載入全部 1,000 款多元配件</p>
       </div>
 
       <!-- 離散數學理論說明小卡 -->
@@ -205,40 +205,83 @@
 
   <script>
     // -------------------------------------------------------------
-    // 1. 生成 100 款主商品與 1,000 款跨領域配件
+    // 1. 跨領域商品領域與豐富化真實品項詞庫 (消除重複感)
     // -------------------------------------------------------------
     const categories = [
-      { name: "3C數碼", img: "💻" },
-      { name: "生活家電", img: "☕" },
-      { name: "戶外露營", img: "⛺" },
-      { name: "汽機車百貨", img: "🚗" },
-      { name: "音樂樂器", img: "🎸" },
-      { name: "運動健身", img: "🏋️" },
-      { name: "廚房衛浴", img: "🍳" },
-      { name: "攝影影音", img: "📷" },
-      { name: "辦公文具", img: "✏️" },
-      { name: "美妝保健", img: "💄" }
+      { 
+        name: "3C數碼", 
+        img: "💻", 
+        items: ["27吋 4K 曲面電競螢幕", "RGB 機械式青軸鍵盤", "三模無線電競滑鼠", "主動降噪藍牙耳機", "10-in-1 Type-C 集線器", "磁吸金屬筆電支架", "2TB 高速外接行動固態硬碟", "25000mAh 雙向快充行動電源", "智慧自動調光螢幕掛燈", "多平台藍牙無線遊戲手把"] 
+      },
+      { 
+        name: "生活家電", 
+        img: "☕", 
+        items: ["智慧自動感應咖啡機", "日系美型蒸氣烤箱", "無線手持強力吸塵器", "循環扇極靜音立扇", "負離子高速吹風機", "智能恆溫電熱水壺", "多功能全自動製冰機", "UV紫外線智慧烘鞋機", "桌上型迷你空氣清淨機", "超音波香氛加濕器"] 
+      },
+      { 
+        name: "戶外露營", 
+        img: "⛺", 
+        items: ["輕量化鈦合金雙層登山杯", "荷蘭鑄鐵鍋具組", "高亮度 LED 露營氛圍燈", "一房一廳速開露營帳篷", "鋁合金摺疊蛋捲桌", "高密度發泡隔音睡墊", "便攜式戶外瓦斯爐", "大容量冰桶保溫箱", "戶外防水防潮地墊", "多功能工兵摺疊鏟"] 
+      },
+      { 
+        name: "汽機車百貨", 
+        img: "🚗", 
+        items: ["高清夜視前後雙錄行車記錄器", "磁吸式車用無線快充手機架", "車用多功能空氣清淨機", "奈米防潑水鍍膜組", "重低音車載藍牙音響", "多功能胎壓偵測器", "車用緊急救援行動電源", "記憶棉人體工學車用腰靠", "超強力車用吸塵器", "LED 矩陣式車室氣氛燈"] 
+      },
+      { 
+        name: "音樂樂器", 
+        img: "🎸", 
+        items: ["桃花心木移調夾", "專業拾音器導線", "多功能數位節拍器", "吉他專用壁掛架", "錄音室專業防噴罩", "耳罩式監聽耳機", "實木吉他調音器", "防潮數位電子琴箱", "金屬琴弦保養潤滑組", "可攜式琴譜折疊架"] 
+      },
+      { 
+        name: "運動健身", 
+        img: "🏋️", 
+        items: ["專業高密度瑜珈墊", "可調式重力啞鈴組", "防滑透氣舉重手套", "高彈力乳膠阻力訓練帶", "智慧計數跳繩", "大容量運動太空瓶", "筋膜放鬆深層按摩槍", "多功能懸吊訓練帶", "核心肌群訓練腹輪", "運動防護機能護膝"] 
+      },
+      { 
+        name: "廚房衛浴", 
+        img: "🍳", 
+        items: ["日本職人手工菜刀組", "不沾陶瓷平底鍋", "食品級矽膠耐熱鍋鏟", "多功能料理電子秤", "不鏽鋼雙層保鮮盒組", "自動感應給皂機", "強力吸盤吹風機架", "北歐風陶瓷衛浴五件套", "防滑吸水地墊", "多段式節水蓮蓬頭"] 
+      },
+      { 
+        name: "攝影影音", 
+        img: "📷", 
+        items: ["碳纖維輕量化三腳架", "專業相機防潮箱", "V90 高速記憶卡 256GB", "環形直播補光燈", "相機減光鏡濾鏡組", "無線領夾式麥克風", "多功能攝影師後背包", "相機快拆背帶組", "手持穩定器三軸雲台", "鏡頭專用清潔組"] 
+      },
+      { 
+        name: "辦公文具", 
+        img: "✏️", 
+        items: ["磁吸式桌面整線理線器", "多功能金屬筆筒收納盒", "人體工學護腕滑鼠墊", "LED 護眼觸控檯燈", "無線簡報器雷射筆", "多國語言萬用轉接頭", "精美皮革桌墊", "多功能精密螺絲起子組", "強力磁鐵辦公白板", "檔案分類收納公事包"] 
+      },
+      { 
+        name: "美妝保健", 
+        img: "💄", 
+        items: ["LED 智能美妝鏡", "大容量化妝品收納盒", "負離子直捲髮梳", "電動美甲修護器", "超音波洗臉刷", "隨身香水噴霧分裝瓶", "旅行收納盥洗包", "草本精油放鬆滾珠瓶", "保濕噴霧奈米蒸臉機", "竹炭溫感眼罩"] 
+      }
     ];
 
     const mainProducts = [];
     const accessories = [];
 
+    // 生成 100 款主商品
     for (let i = 1; i <= 100; i++) {
       const cat = categories[(i - 1) % categories.length];
       mainProducts.push({
         id: `P${String(i).padStart(3, '0')}`,
-        name: `${cat.name} 旗艦主打品款 ${i}`,
+        name: `${cat.name} 旗艦主打品代號 #${i}`,
         price: 5000 + (i * 350),
         catId: (i - 1) % categories.length,
         img: cat.img
       });
     }
 
+    // 生成 1,000 款配件 (利用豐富的品項詞庫組合，徹底消除重複感)
     for (let j = 1; j <= 1000; j++) {
       const cat = categories[(j - 1) % categories.length];
+      const baseName = cat.items[(j * 17) % cat.items.length]; // 交叉選取詞庫
       accessories.push({
         id: `A${String(j).padStart(4, '0')}`,
-        name: `${cat.name} 周邊專業配件 ${j}`,
+        name: `${baseName} (專業旗艦版 ${j})`,
         price: 300 + ((j * 37) % 29500),
         catId: (j - 1) % categories.length,
         img: cat.img
