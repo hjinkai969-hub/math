@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>智慧商品關聯推薦系統 (Discrete Math Recommendation System)</title>
-  <!-- Tailwind CSS CDN (介面美化) -->
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -13,13 +13,20 @@
 
   <!-- Header -->
   <header class="bg-indigo-600 text-white py-6 shadow-md">
-    <div class="max-w-6xl mx-auto px-4">
-      <h1 class="text-3xl font-bold flex items-center gap-2">
-        <i data-lucide="shopping-bag"></i> 智慧商品關聯推薦系統
-      </h1>
-      <p class="text-indigo-200 mt-1 text-sm">
-        應用離散數學：集合 (Sets)、二元關係矩陣 (Relation Matrix) 與加權圖論 (Weighted Graph)
-      </p>
+    <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
+      <div>
+        <h1 class="text-3xl font-bold flex items-center gap-2">
+          <i data-lucide="shopping-bag"></i> 智慧商品關聯推薦系統
+        </h1>
+        <p class="text-indigo-200 mt-1 text-sm">
+          應用離散數學：集合、關係矩陣與加權圖論 + 購物車總額計算
+        </p>
+      </div>
+      <!-- 購物車按鈕指示 -->
+      <div class="bg-indigo-700 px-4 py-2 rounded-lg border border-indigo-500 flex items-center gap-2">
+        <i data-lucide="shopping-cart"></i>
+        <span>購物車品項: <strong id="cartCount">0</strong> 項</span>
+      </div>
     </div>
   </header>
 
@@ -33,7 +40,7 @@
         <label class="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-1">
           <i data-lucide="package" class="w-4 h-4 text-indigo-600"></i> 1. 選擇主商品 $x \in S$
         </label>
-        <select id="primaryProductSelect" onchange="calculateRecommendations()" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        <select id="primaryProductSelect" onchange="onMainProductChange()" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
           <!-- JS 動態生成 -->
         </select>
       </div>
@@ -55,9 +62,9 @@
           <i data-lucide="brain-circuit" class="w-4 h-4"></i> 離散數學核心原理
         </div>
         <p><strong>• 集合 (Set $S$):</strong> 所有商品的集合。</p>
-        <p><strong>• 關係加權 (Weighted Relation $R$):</strong> $R(x, y) = w$ 表示商品 $x$ 與 $y$ 之關聯分數 (1~10 分)。</p>
-        <p><strong>• 推薦子集 ($R_{rec}$):</strong> 篩選滿滿足預算且關聯分數大於臨界值之商品集合：<br>
-          <code class="bg-white px-1 py-0.5 rounded border border-indigo-200 text-indigo-800">R_rec = { y ∈ S | (x, y) ∈ R ∧ price(y) ≤ Budget }</code>
+        <p><strong>• 關係加權 (Weighted Relation $R$):</strong> $R(x, y)$ 表示關聯分數 (1~10 分)。</p>
+        <p><strong>• 購物車集合 ($C \subset S$):</strong> 使用者選購之商品子集，總金額為所有元素價格之總和：<br>
+          <code class="bg-white px-1 py-0.5 rounded border border-indigo-200 text-indigo-800">Total = Σ price(c) for c ∈ C</code>
         </p>
       </div>
 
@@ -67,21 +74,37 @@
     <section class="lg:col-span-2 space-y-6">
       
       <!-- 主商品資訊卡 -->
-      <div id="mainProductCard" class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-4">
+      <div id="mainProductCard" class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
         <!-- JS 動態渲染 -->
       </div>
 
       <!-- 推薦配件清單 -->
       <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
         <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <i data-lucide="sparkles" class="text-amber-500"></i> 智慧推薦配件 (按關聯度排序)
+          <i data-lucide="sparkles" class="text-amber-500"></i> 智慧推薦配件 (可直接加入購物車)
         </h2>
         <div id="recommendationList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- JS 動態渲染 -->
         </div>
       </div>
 
-      <!-- 關聯矩陣視覺化 (離散數學成果展示) -->
+      <!-- 🛒 購物車結算專區 -->
+      <div class="bg-indigo-900 text-white p-6 rounded-xl shadow-md space-y-4">
+        <h2 class="text-lg font-bold flex items-center gap-2 border-b border-indigo-800 pb-3">
+          <i data-lucide="shopping-cart"></i> 我的購物車清單與總金額計算
+        </h2>
+        
+        <div id="cartItemsList" class="space-y-2 max-h-48 overflow-y-auto pr-2">
+          <!-- JS 動態渲染購物車項目 -->
+        </div>
+
+        <div class="flex justify-between items-center pt-4 border-t border-indigo-800 text-lg">
+          <span class="font-medium text-indigo-200">應付總金額 (Total Price):</span>
+          <span id="cartTotalPrice" class="text-2xl font-bold text-amber-400">NT$ 0</span>
+        </div>
+      </div>
+
+      <!-- 關聯矩陣視覺化 -->
       <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
         <h2 class="text-md font-bold text-slate-800 mb-3 flex items-center gap-2">
           <i data-lucide="grid" class="text-indigo-600"></i> 當前商品的關聯權重矩陣列 (Relation Vector)
@@ -125,12 +148,14 @@
       { id: "A07", name: "筆電散熱支架", price: 800, category: "Accessory", img: "📐" }
     ];
 
-    // 關聯權重矩陣：Relation Matrix W[main_id][accessory_id] (分數 1~10)
     const relationWeights = {
-      "P01": { "A01": 9, "A02": 10, "A03": 10, "A04": 8, "A05": 3, "A06": 1, "A07": 2 }, // 電競主機
-      "P02": { "A01": 6, "A02": 5, "A03": 7, "A04": 6, "A05": 10, "A06": 4, "A07": 9 }, // 筆電
-      "P03": { "A01": 2, "A02": 4, "A03": 3, "A04": 7, "A05": 6, "A06": 10, "A07": 5 }  // 平板
+      "P01": { "A01": 9, "A02": 10, "A03": 10, "A04": 8, "A05": 3, "A06": 1, "A07": 2 },
+      "P02": { "A01": 6, "A02": 5, "A03": 7, "A04": 6, "A05": 10, "A06": 4, "A07": 9 },
+      "P03": { "A01": 2, "A02": 4, "A03": 3, "A04": 7, "A05": 6, "A06": 10, "A07": 5 }
     };
+
+    // 購物車集合 (預設包含當前選擇的主商品)
+    let cart = [];
 
     // -------------------------------------------------------------
     // 2. 界面初始化與控制邏輯
@@ -144,8 +169,8 @@
         select.appendChild(option);
       });
 
-      lucide.createIcons();
-      calculateRecommendations();
+      // 初始化載入第一個主商品進購物車
+      onMainProductChange();
     };
 
     function updateBudgetDisplay() {
@@ -153,8 +178,76 @@
       document.getElementById("budgetValue").innerText = `NT$ ${parseInt(budget).toLocaleString()}`;
     }
 
+    // 當切換主商品時，重置購物車裡的主商品並重新計算推薦
+    function onMainProductChange() {
+      const selectedMainId = document.getElementById("primaryProductSelect").value;
+      const mainProduct = products.find(p => p.id === selectedMainId);
+
+      // 替換購物車中的主商品（確保購物車永遠只有一個主商品，可搭配多個配件）
+      cart = cart.filter(item => item.category !== "Main");
+      cart.unshift({ ...mainProduct }); // 放到購物車最前方
+
+      calculateRecommendations();
+      updateCartDisplay();
+    }
+
     // -------------------------------------------------------------
-    // 3. 離散數學推薦演算法 (Core Logic)
+    // 3. 購物車操作函數
+    // -------------------------------------------------------------
+    function toggleCart(productId) {
+      const product = products.find(p => p.id === productId);
+      const existingIndex = cart.findIndex(item => item.id === productId);
+
+      if (existingIndex > -1) {
+        // 如果已經在購物車中，則移除
+        cart.splice(existingIndex, 1);
+      } else {
+        // 如果不在購物車中，則加入
+        cart.push({ ...product });
+      }
+
+      calculateRecommendations();
+      updateCartDisplay();
+    }
+
+    function updateCartDisplay() {
+      const cartContainer = document.getElementById("cartItemsList");
+      const cartCountEl = document.getElementById("cartCount");
+      const totalPriceEl = document.getElementById("cartTotalPrice");
+
+      cartContainer.innerHTML = "";
+      cartCountEl.innerText = cart.length;
+
+      let totalSum = 0;
+
+      cart.forEach(item => {
+        totalSum += item.price;
+        const isMain = item.category === "Main";
+        
+        cartContainer.innerHTML += `
+          <div class="flex justify-between items-center bg-indigo-800/60 px-3 py-2 rounded-lg text-sm">
+            <div class="flex items-center gap-2">
+              <span>${item.img}</span>
+              <span>${item.name}</span>
+              ${isMain ? '<span class="text-xs bg-indigo-500 px-1.5 py-0.5 rounded">主商品</span>' : ''}
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-semibold">NT$ ${item.price.toLocaleString()}</span>
+              ${!isMain ? `<button onclick="toggleCart('${item.id}')" class="text-rose-300 hover:text-rose-100 text-xs">✕ 移除</button>` : ''}
+            </div>
+          </div>
+        `;
+      });
+
+      if (cart.length === 0) {
+        cartContainer.innerHTML = `<p class="text-indigo-300 text-sm text-center py-2">購物車目前是空的</p>`;
+      }
+
+      totalPriceEl.innerText = `NT$ ${totalSum.toLocaleString()}`;
+    }
+
+    // -------------------------------------------------------------
+    // 4. 離散數學推薦演算法與渲染
     // -------------------------------------------------------------
     function calculateRecommendations() {
       const selectedMainId = document.getElementById("primaryProductSelect").value;
@@ -165,11 +258,16 @@
 
       // 渲染主商品卡片
       document.getElementById("mainProductCard").innerHTML = `
-        <div class="text-4xl bg-slate-100 p-3 rounded-lg">${mainProduct.img}</div>
-        <div>
-          <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">已選擇主商品</span>
-          <h3 class="text-xl font-bold text-slate-800">${mainProduct.name}</h3>
-          <p class="text-slate-500 font-semibold">NT$ ${mainProduct.price.toLocaleString()}</p>
+        <div class="flex items-center gap-4">
+          <div class="text-4xl bg-slate-100 p-3 rounded-lg">${mainProduct.img}</div>
+          <div>
+            <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">已選擇主商品</span>
+            <h3 class="text-xl font-bold text-slate-800">${mainProduct.name}</h3>
+            <p class="text-slate-500 font-semibold">NT$ ${mainProduct.price.toLocaleString()}</p>
+          </div>
+        </div>
+        <div class="text-right text-xs text-slate-400">
+          主商品已自動加入購物車
         </div>
       `;
 
@@ -179,15 +277,15 @@
       const processedList = accessories.map(acc => {
         const weight = weights[acc.id] || 0;
         const fitsBudget = acc.price <= budget;
-        const isRecommended = fitsBudget && weight >= 5; // 門檻設定：關聯分 >= 5 且未超預算
+        const isRecommended = fitsBudget && weight >= 5;
+        const isInCart = cart.some(item => item.id === acc.id);
         
-        return { ...acc, weight, fitsBudget, isRecommended };
+        return { ...acc, weight, fitsBudget, isRecommended, isInCart };
       });
 
-      // 排序：推薦的優先，再按關聯分數高到低排序
       processedList.sort((a, b) => b.weight - a.weight);
 
-      // 渲染推薦清單 (過濾出符合推薦的)
+      // 渲染推薦清單
       const recContainer = document.getElementById("recommendationList");
       recContainer.innerHTML = "";
       
@@ -201,8 +299,13 @@
           </div>`;
       } else {
         recommendedItems.forEach(item => {
+          const btnText = item.isInCart ? "已加入購物車 ✓" : "+ 加入購物車";
+          const btnClass = item.isInCart 
+            ? "bg-emerald-600 hover:bg-emerald-700 text-white" 
+            : "bg-indigo-600 hover:bg-indigo-700 text-white";
+
           recContainer.innerHTML += `
-            <div class="border border-slate-200 rounded-lg p-4 bg-white hover:border-indigo-300 transition shadow-sm flex flex-col justify-between">
+            <div class="border border-slate-200 rounded-lg p-4 bg-white hover:border-indigo-300 transition shadow-sm flex flex-col justify-between gap-3">
               <div class="flex items-start justify-between">
                 <div class="flex items-center gap-3">
                   <span class="text-3xl">${item.img}</span>
@@ -215,6 +318,9 @@
                   關聯度: ${item.weight}/10
                 </span>
               </div>
+              <button onclick="toggleCart('${item.id}')" class="w-full py-2 px-3 rounded-lg text-sm font-semibold transition ${btnClass}">
+                ${btnText}
+              </button>
             </div>
           `;
         });
